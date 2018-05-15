@@ -802,12 +802,16 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    BillOut.newLine();
 		}
 	    }
-	    BillOut.write("  TEL NO.   :" + " ");
-	    BillOut.write(String.valueOf(clsGlobalVarClass.gClientTelNo));
-	    BillOut.newLine();
-	    BillOut.write("  EMAIL ID  :" + " ");
-	    BillOut.write(clsGlobalVarClass.gClientEmail);
-	    BillOut.newLine();
+	    if (!clsGlobalVarClass.gClientCode.equalsIgnoreCase("247.001"))// BHAGAT TARACHAND
+	    {
+		BillOut.write("  TEL NO.   :" + " ");
+		BillOut.write(String.valueOf(clsGlobalVarClass.gClientTelNo));
+		BillOut.newLine();
+		BillOut.write("  EMAIL ID  :" + " ");
+		BillOut.write(clsGlobalVarClass.gClientEmail);
+		BillOut.newLine();
+	    }
+	    
 	    tblName = rs_BillHD.getString(18);
 	    if (tblName.length() > 0)
 	    {

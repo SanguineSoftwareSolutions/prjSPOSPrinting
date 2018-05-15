@@ -764,10 +764,10 @@ public class clsDayEndTextReport
 	    {
 		bufferedWriter.write(dashLinesFor42Chars);
 		bufferedWriter.newLine();
-		int netTotalWidth=12;
+		int netTotalWidth = 12;
 		if (clsGlobalVarClass.gClientCode.equals("240.001"))
 		{
-		    netTotalWidth=23;
+		    netTotalWidth = 23;
 		}
 		bufferedWriter.write(objUtility.funPrintTextWithAlignment("  Group", 16, "left"));
 		bufferedWriter.write(objUtility.funPrintTextWithAlignment("  Net Total", netTotalWidth, "right"));
@@ -783,7 +783,7 @@ public class clsDayEndTextReport
 		for (clsGroupSubGroupWiseSales objGroupWiseSales : mapGroupWiseData.values())
 		{
 		    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + objGroupWiseSales.getGroupName(), 16, "left"));
-		    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(objGroupWiseSales.getDblNetTotal()),netTotalWidth, "right"));
+		    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(objGroupWiseSales.getDblNetTotal()), netTotalWidth, "right"));
 		    if (!clsGlobalVarClass.gClientCode.equals("240.001"))
 		    {
 			bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(objGroupWiseSales.getDblNetTotalPlusTax()), 12, "right"));
@@ -797,7 +797,7 @@ public class clsDayEndTextReport
 		bufferedWriter.newLine();
 
 		bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + "Total", 16, "left"));
-		bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(totalNetTotal),netTotalWidth, "right"));
+		bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(totalNetTotal), netTotalWidth, "right"));
 		if (!clsGlobalVarClass.gClientCode.equals("240.001"))
 		{
 		    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(grandTotalSales), 12, "right"));
@@ -817,77 +817,43 @@ public class clsDayEndTextReport
 	    DateFormat dteDate = new SimpleDateFormat("dd-MMM-yyyy");
 	    String sbSqlFilters = "", sbSqlFilters1 = "";
 
-	    String sbSqlLive = "select a.strCustomerCode, a.strCustomerName, CreditAmt as  Outstanding,receiptNo,dteReceiptDate,settlement\n"
-		    + "from \n"
-		    + "(\n"
-		    + "\n"
-		    + "SELECT a.strCustomerCode,d.strCustomerName, \n"
-		    + "DATE_FORMAT(DATE(a.dteBillDate),'%d-%b-%Y')dteBillDate\n"
-		    + "FROM tblbillhd a,tblbillsettlementdtl b,tblsettelmenthd c,tblcustomermaster d\n"
-		    + "WHERE a.strBillNo=b.strBillNo AND b.strSettlementCode=c.strSettelmentCode \n"
-		    + "AND DATE(a.dtebilldate)= DATE(b.dtebilldate) AND a.strClientCode=b.strClientCode \n"
-		    + "AND c.strSettelmentType='Credit' AND a.strCustomerCode=d.strCustomerCode \n"
-		    + "AND DATE(a.dteBillDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + "and a.strPOSCode='" + posCode + "' \n"
-		    + "GROUP BY a.strCustomerCode) as a,\n"
-		    + "\n"
-		    + "(SELECT b.strReceiptNo as receiptNo, DATE_FORMAT(DATE(b.dteReceiptDate),'%d-%b-%Y')dteReceiptDate,b.strSettlementName as settlement, \n"
-		    + "SUM(b.dblReceiptAmt) as CreditAmt,c.strCustomerName,a.strCustomerCode\n"
-		    + "FROM tblbillhd a,tblqcreditbillreceipthd b,tblcustomermaster c\n"
-		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate) \n"
-		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode \n"
+	    String sbSqlLive = "SELECT b.strReceiptNo as receiptNo, DATE_FORMAT(DATE(b.dteReceiptDate),'%d-%b-%Y')dteReceiptDate,b.strSettlementName as settlement,  "
+		    + "SUM(b.dblReceiptAmt) as ReceivedAmt,c.strCustomerName,a.strCustomerCode "
+		    + "FROM tblbillhd a,tblcreditbillreceipthd b,tblcustomermaster c "
+		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate)  "
+		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode  "
 		    + "AND DATE(b.dteReceiptDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + "and a.strPOSCode='" + posCode + "' "
-		    + "GROUP BY b.strReceiptNo) as b\n"
-		    + "\n"
-		    + "where a.strCustomerCode = b.strCustomerCode \n";
+		    + " and a.strPOSCode='" + posCode + "'  "
+		    + "GROUP BY c.strCustomerCode,b.strSettlementName ";
 
-	    String sbSqlQFile = "select a.strCustomerCode, a.strCustomerName, CreditAmt as  Outstanding,receiptNo,dteReceiptDate,settlement\n"
-		    + "from \n"
-		    + "(\n"
-		    + "\n"
-		    + "SELECT a.strCustomerCode,d.strCustomerName, \n"
-		    + "DATE_FORMAT(DATE(a.dteBillDate),'%d-%b-%Y')dteBillDate\n"
-		    + "FROM tblqbillhd a,tblqbillsettlementdtl b,tblsettelmenthd c,tblcustomermaster d\n"
-		    + "WHERE a.strBillNo=b.strBillNo AND b.strSettlementCode=c.strSettelmentCode \n"
-		    + "AND DATE(a.dtebilldate)= DATE(b.dtebilldate) AND a.strClientCode=b.strClientCode \n"
-		    + "AND c.strSettelmentType='Credit' AND a.strCustomerCode=d.strCustomerCode \n"
-		    + "AND DATE(a.dteBillDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + "and a.strPOSCode='" + posCode + "' "
-		    + "GROUP BY a.strCustomerCode) as a,\n"
-		    + "\n"
-		    + "(SELECT b.strReceiptNo as receiptNo, DATE_FORMAT(DATE(b.dteReceiptDate),'%d-%b-%Y')dteReceiptDate,b.strSettlementName as settlement, \n"
-		    + "SUM(b.dblReceiptAmt) as CreditAmt,c.strCustomerName,a.strCustomerCode\n"
-		    + "FROM tblqbillhd a,tblqcreditbillreceipthd b,tblcustomermaster c\n"
-		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate) \n"
-		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode \n"
+	    String sbSqlQFile = "SELECT b.strReceiptNo as receiptNo, DATE_FORMAT(DATE(b.dteReceiptDate),'%d-%b-%Y')dteReceiptDate,b.strSettlementName as settlement,  "
+		    + "SUM(b.dblReceiptAmt) as ReceivedAmt,c.strCustomerName,a.strCustomerCode "
+		    + "FROM tblqbillhd a,tblqcreditbillreceipthd b,tblcustomermaster c "
+		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate)  "
+		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode  "
 		    + "AND DATE(b.dteReceiptDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + "and a.strPOSCode='" + posCode + "' "
-		    + "GROUP BY b.strReceiptNo) as b\n"
-		    + "\n"
-		    + "where a.strCustomerCode = b.strCustomerCode \n";
+		    + " and a.strPOSCode='" + posCode + "'  "
+		    + "GROUP BY c.strCustomerCode,b.strSettlementName ";
 
-	    sbSqlFilters1 = sbSqlFilters1 + " Order by a.strCustomerName ";
+	    sbSqlFilters1 = sbSqlFilters1 + " ";
 
 	    sbSqlLive += " " + sbSqlFilters1;
 	    sbSqlQFile += " " + sbSqlFilters1;
 
 	    ResultSet rsLiveData = clsGlobalVarClass.dbMysql.executeResultSet(sbSqlLive);
-
 	    while (rsLiveData.next())
 	    {
 
 		clsBillDtl objBean = new clsBillDtl();
-		objBean.setStrCustomerCode(rsLiveData.getString(1));
-		objBean.setStrCustomerName(rsLiveData.getString(2));
-		objBean.setDblAmount(rsLiveData.getDouble(3));   //Receipt Amount
-		objBean.setStrReceiptNo(rsLiveData.getString(4));  //Receipt No
-		objBean.setDteReceiptDate(rsLiveData.getString(5));
-		objBean.setStrSettlementName(rsLiveData.getString(6));
-		if (!rsLiveData.getString(4).equalsIgnoreCase(""))
-		{
-		    listOfCreditBillReport.add(objBean);
-		}
+
+		objBean.setStrCustomerName(rsLiveData.getString(5));
+		objBean.setDblAmount(rsLiveData.getDouble(4));   //Receipt Amount
+		objBean.setStrReceiptNo(rsLiveData.getString(1));  //Receipt No
+		objBean.setDteReceiptDate(rsLiveData.getString(2));
+		objBean.setStrSettlementName(rsLiveData.getString(3));
+
+		listOfCreditBillReport.add(objBean);
+
 	    }
 	    rsLiveData.close();
 
@@ -895,16 +861,14 @@ public class clsDayEndTextReport
 	    while (rsQfileModData.next())
 	    {
 		clsBillDtl objBean = new clsBillDtl();
-		objBean.setStrCustomerCode(rsQfileModData.getString(1));
-		objBean.setStrCustomerName(rsQfileModData.getString(2));
-		objBean.setDblAmount(rsQfileModData.getDouble(3));   //Receipt Amount
-		objBean.setStrReceiptNo(rsQfileModData.getString(4));  //Receipt No
-		objBean.setDteReceiptDate(rsQfileModData.getString(5));
-		objBean.setStrSettlementName(rsQfileModData.getString(6));
-		if (!rsQfileModData.getString(4).equalsIgnoreCase(""))
-		{
-		    listOfCreditBillReport.add(objBean);
-		}
+
+		objBean.setStrCustomerName(rsQfileModData.getString(5));
+		objBean.setDblAmount(rsQfileModData.getDouble(4));   //Receipt Amount
+		objBean.setStrReceiptNo(rsQfileModData.getString(1));  //Receipt No
+		objBean.setDteReceiptDate(rsQfileModData.getString(2));
+		objBean.setStrSettlementName(rsQfileModData.getString(3));
+
+		listOfCreditBillReport.add(objBean);
 	    }
 	    rsQfileModData.close();
 

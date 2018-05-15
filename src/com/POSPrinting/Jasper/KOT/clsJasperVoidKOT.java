@@ -13,6 +13,7 @@ import com.POSPrinting.Interfaces.clsVoidKOTFormat;
 import com.POSPrinting.Utility.clsPrintingUtility;
 import java.awt.Dimension;
 import java.io.InputStream;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -76,7 +77,12 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
         {
 
             hm.put("imagePath", imagePath);
-            hm.put("KOTorNC", "Void KOT");
+	    if(clsGlobalVarClass.gClientCode.equals("239.001")){
+		hm.put("KOTorNC", "Cancel KOT");
+	    }else{
+		hm.put("KOTorNC", "Void KOT");
+	    }
+            
             hm.put("KOTTitle", "KOT");
 
             //item will pickup from tblvoidkot
@@ -149,6 +155,53 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
             }
             rs_VOIDKOT_Items.close();
 
+	    String areaCodeOfTable="";
+	    String tableNo="";
+	    String SQL_KOT_Dina_tableName="select a.strTableNo from tblvoidkot a where a.strKOTNo='"+KotNo+"'";
+	    ResultSet rs_Dina_Table = clsGlobalVarClass.dbMysql.executeResultSet(SQL_KOT_Dina_tableName);
+		if (rs_Dina_Table.next())
+		{
+		    tableNo = rs_Dina_Table.getString(1);
+		}
+	    SQL_KOT_Dina_tableName = "select strTableName,strAreaCode "
+		    + " from tbltablemaster "
+		    + " where strTableNo='"+tableNo+"' and strOperational='Y'";
+	    rs_Dina_Table = clsGlobalVarClass.dbMysql.executeResultSet(SQL_KOT_Dina_tableName);
+		if (rs_Dina_Table.next())
+		{
+		    areaCodeOfTable = rs_Dina_Table.getString(2);
+		}
+	    
+	    rs_Dina_Table.close();
+	    if (clsGlobalVarClass.gAreaWiseCostCenterKOTPrinting)
+	    {
+		String sqlAreaWiseCostCenterKOTPrinting = "select a.strPrimaryPrinterPort,a.strSecondaryPrinterPort,a.strPrintOnBothPrintersYN "
+			+ "from tblprintersetupmaster a "
+			+ "where (a.strPOSCode='"+clsGlobalVarClass.gPOSCode+"' or a.strPOSCode='All') "
+			+ "and a.strAreaCode='"+areaCodeOfTable+"' "
+			+ "and a.strCostCenterCode='"+costCenterCode+"' "
+			+ "and a.strPrinterType='Cost Center' ";
+		ResultSet rsPrinter = clsGlobalVarClass.dbMysql.executeResultSet(sqlAreaWiseCostCenterKOTPrinting);
+		if (rsPrinter.next())
+		{
+		    primaryPrinterName = rsPrinter.getString(1);
+		    secondaryPrinterName = rsPrinter.getString(2);
+		    //printOnBothPrinters = rsPrinter.getString(3);
+		}
+		rsPrinter.close();
+	    }
+	    else
+	    {
+		ResultSet rsPrinter = clsGlobalVarClass.dbMysql.executeResultSet("select a.strPrinterPort,a.strSecondaryPrinterPort,a.strPrintOnBothPrinters from tblcostcentermaster  a where a.strCostCenterCode='" + costCenterCode + "' ");
+		if (rsPrinter.next())
+		{
+		    primaryPrinterName = rsPrinter.getString(1);
+		    secondaryPrinterName = rsPrinter.getString(2);
+		    //printOnBothPrinters = rsPrinter.getString(3);
+		}
+		rsPrinter.close();
+	    }
+	    
             hm.put("listOfItemDtl", listOfKOTDetail);
             listData.add(listOfKOTDetail);
             String reportName = "com/POSGlobal/reports/rptGenrateVoidKOTJasperReport.jasper";
