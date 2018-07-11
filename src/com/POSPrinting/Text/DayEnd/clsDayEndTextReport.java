@@ -50,6 +50,7 @@ public class clsDayEndTextReport
 
     private final DecimalFormat gDecimalFormat = clsGlobalVarClass.funGetGlobalDecimalFormatter();
     private final DecimalFormat decimalFormatForInt = new DecimalFormat("0");
+    String dashLinesFor42Chars = "  ----------------------------------------";
 
     /**
      *
@@ -63,7 +64,7 @@ public class clsDayEndTextReport
     {
 	try
 	{
-	    String dashLinesFor42Chars = "  ----------------------------------------";
+
 	    String billHd = "tblqbillhd";
 	    String billDtl = "tblqbilldtl";
 	    String billSettlementDtl = "tblqbillsettlementdtl";
@@ -132,10 +133,13 @@ public class clsDayEndTextReport
 			+ " ,sum(a.intNoOfVoidKOT),sum(a.dblUsedDebitCardBalance),sum(a.dblUnusedDebitCardBalance),sum(a.dblTipAmt),sum(a.dblNoOfDiscountedBill)\n"
 			+ "FROM tbldayendprocess a,tblposmaster b "
 			+ " where b.strPosCode=a.strPosCode "
-			+ " and a.strPOSCode=? and date(a.dtePOSDate)=? ;";
+			+ " and a.strPOSCode=? "
+			+ " and date(a.dtePOSDate)=? "
+			+ " and a.intShiftCode=? ";
 		PreparedStatement pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sqlDayEnd);
 		pst.setString(1, posCode);
 		pst.setString(2, billDate);
+		pst.setString(3, String.valueOf(shiftNo));
 		rsDayend = pst.executeQuery();
 	    }
 	    if (rsDayend.next())
@@ -1051,6 +1055,8 @@ public class clsDayEndTextReport
 
 	    }
 
+	    funTotalItemIncentive(bufferedWriter, billDate, posCode, shiftNo);
+
 	    //        
 	    bufferedWriter.newLine();
 	    bufferedWriter.newLine();
@@ -1089,5 +1095,223 @@ public class clsDayEndTextReport
 	{
 	    e.printStackTrace();
 	}
+    }
+
+    private void funTotalItemIncentive(BufferedWriter bufferedWriter, String billDate, String posCode, int shiftNo)
+    {
+	try
+	{
+	    StringBuilder sqlBuilder = new StringBuilder();
+	    List<clsBillDtl> listOfItemWiseIncentives = new ArrayList<>();
+	    Map<String, clsBillDtl> mapItem = new HashMap<>();
+
+	    double totalIncentiveAmt = 0.00;
+
+	    String type = "Item Wise";
+
+	    String waiterShortName = " '' ";
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		waiterShortName = " d.strWShortName ";
+	    }
+	    String waiterShortNo = " '' ";
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		waiterShortNo = " d.strWaiterNo ";
+	    }
+
+	    //Live Data
+	    sqlBuilder.setLength(0);
+	    sqlBuilder.append("SELECT " + waiterShortName + ",b.strItemName,sum(b.dblAmount),c.dblIncentiveValue "
+		    + " ,IF(c.strIncentiveType='Amt', (c.dblIncentiveValue)*sum(b.dblQuantity), (c.dblIncentiveValue/100)*sum(b.dblAmount)) as amount, "
+		    + " e.strPosName,e.strPosCode,b.strItemCode," + waiterShortNo + ",c.strIncentiveType,sum(b.dblQuantity)  "
+		    + " FROM tblbillhd a,tblbilldtl b,tblposwiseitemwiseincentives c ");
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(",tblwaitermaster d ");
+	    }
+	    sqlBuilder.append(",tblposmaster e,tblitemmaster f,tblsubgrouphd g,tblgrouphd h "
+		    + " where a.strBillNo=b.strBillNo "
+		    + " and b.strItemCode=c.strItemCode ");
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(" and b.strWaiterNo=d.strWaiterNo ");
+	    }
+	    sqlBuilder.append(" and a.strPOSCode=e.strPosCode "
+		    + " and a.strPOSCode=c.strPOSCode "
+		    + " and c.dblIncentiveValue>0 "
+		    + " and b.strItemCode=f.strItemCode "
+		    + " and f.strSubGroupCode=g.strSubGroupCode "
+		    + " and g.strGroupCode=h.strGroupCode "
+		    + " and date(a.dteBillDate) between '" + billDate + "' and '" + billDate + "' ");
+	    if (!posCode.equalsIgnoreCase("All"))
+	    {
+		sqlBuilder.append("and a.strPOSCode='" + posCode + "' ");
+	    }
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+
+	    sqlBuilder.append("and a.strBillNo not in (select u.strBillNo "
+		    + " from tblbillhd v,tblbillsettlementdtl u,tblsettelmenthd w "
+		    + " where v.strBillNo=u.strBillNo and u.strSettlementCode=w.strSettelmentCode "
+		    + " and w.strSettelmentType='Complementary' and date(v.dteBillDate) between '" + billDate + "' and '" + billDate + "')");
+	    if (type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(" group by b.strItemCode ");
+		sqlBuilder.append(" order by b.strItemName ");
+	    }
+	    else if (type.equalsIgnoreCase("Summary"))
+	    {
+		sqlBuilder.append(" group by b.strWaiterNo");
+		sqlBuilder.append(" order by d.strWShortName ");
+	    }
+	    else
+	    {
+		sqlBuilder.append(" group by b.strWaiterNo,c.strPOSCode,b.strItemCode ");
+		sqlBuilder.append(" order by e.strPosName,d.strWShortName,b.strItemName ");
+	    }
+	    ResultSet rsWaiterWiseItemSales = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
+	    while (rsWaiterWiseItemSales.next())
+	    {
+		String itemCode = rsWaiterWiseItemSales.getString(8);
+		totalIncentiveAmt += rsWaiterWiseItemSales.getDouble(5);
+
+		if (mapItem.containsKey(itemCode))
+		{
+		    clsBillDtl obj = mapItem.get(itemCode);
+
+		    obj.setDblQuantity(obj.getDblQuantity() + rsWaiterWiseItemSales.getDouble(11));
+		    obj.setDblAmount(obj.getDblAmount() + rsWaiterWiseItemSales.getDouble(3));
+
+		    obj.setDblIncentive(obj.getDblIncentive() + rsWaiterWiseItemSales.getDouble(5));
+		}
+		else
+		{
+		    clsBillDtl obj = new clsBillDtl();
+
+		    obj.setStrWShortName(rsWaiterWiseItemSales.getString(1));
+		    obj.setStrItemName(rsWaiterWiseItemSales.getString(2));
+		    obj.setStrItemCode(rsWaiterWiseItemSales.getString(8));
+		    obj.setDblAmount(rsWaiterWiseItemSales.getDouble(3));
+		    obj.setDblIncentivePer(rsWaiterWiseItemSales.getDouble(4));
+		    obj.setDblIncentive(rsWaiterWiseItemSales.getDouble(5));
+		    obj.setStrPosName(rsWaiterWiseItemSales.getString(6));
+		    obj.setStrPOSCode(rsWaiterWiseItemSales.getString(7));
+		    obj.setStrWaiterNo(rsWaiterWiseItemSales.getString(9));
+		    obj.setStrRemarks(rsWaiterWiseItemSales.getString(10));
+		    obj.setDblQuantity(rsWaiterWiseItemSales.getDouble(11));
+
+		    mapItem.put(itemCode, obj);
+		}
+	    }
+	    rsWaiterWiseItemSales.close();
+
+	    //Q Data
+	    sqlBuilder.setLength(0);
+	    sqlBuilder.append("SELECT " + waiterShortName + ",b.strItemName,sum(b.dblAmount),c.dblIncentiveValue "
+		    + " ,IF(c.strIncentiveType='Amt', (c.dblIncentiveValue)*sum(b.dblQuantity), (c.dblIncentiveValue/100)*sum(b.dblAmount)) as amount, "
+		    + " e.strPosName,e.strPosCode,b.strItemCode," + waiterShortNo + ",c.strIncentiveType,sum(b.dblQuantity)  "
+		    + " FROM tblqbillhd a,tblqbilldtl b,tblposwiseitemwiseincentives c ");
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(",tblwaitermaster d ");
+	    }
+	    sqlBuilder.append(",tblposmaster e,tblitemmaster f,tblsubgrouphd g,tblgrouphd h "
+		    + " where a.strBillNo=b.strBillNo "
+		    + " and b.strItemCode=c.strItemCode ");
+	    if (!type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(" and b.strWaiterNo=d.strWaiterNo ");
+	    }
+	    sqlBuilder.append(" and a.strPOSCode=e.strPosCode "
+		    + " and a.strPOSCode=c.strPOSCode "
+		    + " and c.dblIncentiveValue>0 "
+		    + " and b.strItemCode=f.strItemCode "
+		    + " and f.strSubGroupCode=g.strSubGroupCode "
+		    + " and g.strGroupCode=h.strGroupCode "
+		    + " and date(a.dteBillDate) between '" + billDate + "' and '" + billDate + "' ");
+	    if (!posCode.equalsIgnoreCase("All"))
+	    {
+		sqlBuilder.append("and a.strPOSCode='" + posCode + "' ");
+	    }
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+
+	    sqlBuilder.append("and a.strBillNo not in (select u.strBillNo "
+		    + " from tblqbillhd v,tblqbillsettlementdtl u,tblsettelmenthd w "
+		    + " where v.strBillNo=u.strBillNo and u.strSettlementCode=w.strSettelmentCode "
+		    + " and w.strSettelmentType='Complementary' and date(v.dteBillDate) between '" + billDate + "' and '" + billDate + "')");
+	    if (type.equalsIgnoreCase("Item Wise"))
+	    {
+		sqlBuilder.append(" group by b.strItemCode ");
+		sqlBuilder.append(" order by b.strItemName ");
+	    }
+	    else if (type.equalsIgnoreCase("Summary"))
+	    {
+		sqlBuilder.append(" group by b.strWaiterNo");
+		sqlBuilder.append(" order by d.strWShortName ");
+	    }
+	    else
+	    {
+		sqlBuilder.append(" group by b.strWaiterNo,c.strPOSCode,b.strItemCode ");
+		sqlBuilder.append(" order by e.strPosName,d.strWShortName,b.strItemName ");
+	    }
+	    rsWaiterWiseItemSales = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
+	    while (rsWaiterWiseItemSales.next())
+	    {
+		String itemCode = rsWaiterWiseItemSales.getString(8);
+
+		totalIncentiveAmt += rsWaiterWiseItemSales.getDouble(5);
+
+		if (mapItem.containsKey(itemCode))
+		{
+		    clsBillDtl obj = mapItem.get(itemCode);
+
+		    obj.setDblQuantity(obj.getDblQuantity() + rsWaiterWiseItemSales.getDouble(11));
+		    obj.setDblAmount(obj.getDblAmount() + rsWaiterWiseItemSales.getDouble(3));
+
+		    obj.setDblIncentive(obj.getDblIncentive() + rsWaiterWiseItemSales.getDouble(5));
+		}
+		else
+		{
+		    clsBillDtl obj = new clsBillDtl();
+
+		    obj.setStrWShortName(rsWaiterWiseItemSales.getString(1));
+		    obj.setStrItemName(rsWaiterWiseItemSales.getString(2));
+		    obj.setStrItemCode(rsWaiterWiseItemSales.getString(8));
+		    obj.setDblAmount(rsWaiterWiseItemSales.getDouble(3));
+		    obj.setDblIncentivePer(rsWaiterWiseItemSales.getDouble(4));
+		    obj.setDblIncentive(rsWaiterWiseItemSales.getDouble(5));
+		    obj.setStrPosName(rsWaiterWiseItemSales.getString(6));
+		    obj.setStrPOSCode(rsWaiterWiseItemSales.getString(7));
+		    obj.setStrWaiterNo(rsWaiterWiseItemSales.getString(9));
+		    obj.setStrRemarks(rsWaiterWiseItemSales.getString(10));
+		    obj.setDblQuantity(rsWaiterWiseItemSales.getDouble(11));
+
+		    mapItem.put(itemCode, obj);
+		}
+	    }
+	    rsWaiterWiseItemSales.close();
+
+	    bufferedWriter.newLine();
+	    bufferedWriter.write(dashLinesFor42Chars);
+
+	    bufferedWriter.newLine();
+	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  Total Incentive Amount",22, "left"));	   
+	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(totalIncentiveAmt),17, "right"));
+
+	    bufferedWriter.newLine();
+	    bufferedWriter.write(dashLinesFor42Chars);
+
+	}
+	catch (Exception e)
+	{
+	    e.printStackTrace();
+	}
+
     }
 }

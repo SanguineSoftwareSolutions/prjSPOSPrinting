@@ -172,7 +172,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		}
 	    }
 
-	    final String ORDER = "HLF";
+	    final String ORDER = "FLH";
 	    Comparator<String> billNoSorting = new Comparator<String>()
 	    {
 		@Override
@@ -231,22 +231,22 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    clsBillDtl objBillDtl = new clsBillDtl();
 		    if (billSeries.equalsIgnoreCase("F"))
 		    {
-			objBillDtl.setStrItemName("Food Total");
+			objBillDtl.setStrItemName("Food Total".toUpperCase());
 			objBillDtl.setDblAmount(billTotal);
 		    }
 		    else if (billSeries.equalsIgnoreCase("L"))
 		    {
-			objBillDtl.setStrItemName("Liquor Total");
+			objBillDtl.setStrItemName("Liquor Total".toUpperCase());
 			objBillDtl.setDblAmount(billTotal);
 		    }
 		    else if (billSeries.equalsIgnoreCase("H"))
 		    {
-			objBillDtl.setStrItemName("Sheesha Total");//"Hukkah Total"
+			objBillDtl.setStrItemName("Sheesha Total".toUpperCase());//"Hukkah Total"
 			objBillDtl.setDblAmount(billTotal);
 		    }
 		    else
 		    {
-			objBillDtl.setStrItemName("Total");
+			objBillDtl.setStrItemName("Total".toUpperCase());
 			objBillDtl.setDblAmount(billTotal);
 		    }
 		    dblAllBillGrandTotal += billTotal;
@@ -303,12 +303,13 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		}
 
 		boolean isReprint = false;
-		if ("reprint".equalsIgnoreCase(reprint))
+
+		if ("reprint".equalsIgnoreCase(reprint) && billCount == 0)
 		{
 		    isReprint = true;
 		    hm.put("duplicate", "[DUPLICATE]");
 		}
-		if (transType.equals("Void"))
+		if (transType.equals("Void") && billCount == 0)
 		{
 		    hm.put("voidedBill", "VOIDED BILL");
 		}
@@ -323,7 +324,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		List<clsBillDtl> listOfHomeDeliveryDtl = new ArrayList<>();
 		clsBillDtl objBillDtl = new clsBillDtl();
 
-		if (rs_HomeDelivery.next())
+		if (rs_HomeDelivery.next() && billCount == 0)
 		{
 		    flag_isHomeDelvBill = true;
 
@@ -480,7 +481,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		}
 		rs_HomeDelivery.close();
 		int result = objPrintingUtility.funPrintTakeAwayForJasper(billhd, billNo);
-		if (result == 1)
+		if (result == 1 && billCount == 0)
 		{
 		    billType = "Take Away";
 		    String sql = "select a.strBillNo,a.dteBillDate,a.strCustomerCode,b.strCustomerName,b.longMobileNo "
@@ -503,7 +504,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    }
 		    rsCustomer.close();
 		}
-		if (clsGlobalVarClass.gPrintTaxInvoice.equalsIgnoreCase("Y"))
+		if (clsGlobalVarClass.gPrintTaxInvoice.equalsIgnoreCase("Y") && billCount == 0)
 		{
 		    hm.put("TAX_INVOICE", "TAX INVOICE");
 		}
@@ -574,13 +575,10 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    }
 		    else if (billNo.startsWith("L"))//Liquor bill license name
 		    {
-
-			hm.put("posWiseHeading", "XO ZERO LOUNGE");
 			licenseName = "WILDFIRE RESTAURANT AND BAR";
 		    }
 		    else if (billNo.startsWith("H"))//Hukka bill license name
 		    {
-			hm.put("posWiseHeading", "XO ZERO LOUNGE");
 			licenseName = "WILDFIRE RESTAURANT AND BAR";
 		    }
 		    else
@@ -589,14 +587,30 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    }
 
 		    hm.put("ClientName", licenseName);
-		    hm.put("ClientAddress1", clsGlobalVarClass.gClientAddress1);
-		    hm.put("ClientAddress2", clsGlobalVarClass.gClientAddress2);
-		    hm.put("ClientAddress3", clsGlobalVarClass.gClientAddress3);
-
-		    if (clsGlobalVarClass.gCityName.trim().length() > 0)
+		    if (billCount == 0)
 		    {
-			hm.put("ClientCity", clsGlobalVarClass.gCityName);
+			hm.put("posWiseHeading", "XO ZERO LOUNGE");
 		    }
+
+		    if (billCount == 0)
+		    {
+			hm.put("ClientAddress1", clsGlobalVarClass.gClientAddress1);
+			hm.put("ClientAddress2", clsGlobalVarClass.gClientAddress2);
+			hm.put("ClientAddress3", clsGlobalVarClass.gClientAddress3);
+
+			if (clsGlobalVarClass.gCityName.trim().length() > 0)
+			{
+			    hm.put("ClientCity", clsGlobalVarClass.gCityName);
+			}
+		    }
+		    else
+		    {
+			hm.put("ClientAddress1", "");
+			hm.put("ClientAddress2", "");
+			hm.put("ClientAddress3", "");
+			hm.put("ClientCity", "");
+		    }
+
 		}
 		else
 		{
@@ -610,10 +624,18 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 			hm.put("ClientCity", clsGlobalVarClass.gCityName);
 		    }
 		}
-
-		hm.put("TEL NO", String.valueOf(clsGlobalVarClass.gClientTelNo));
-		hm.put("EMAIL ID", clsGlobalVarClass.gClientEmail);
-		hm.put("Line", Linefor5);
+		if (billCount == 0)
+		{
+		    hm.put("TEL NO", String.valueOf(clsGlobalVarClass.gClientTelNo));
+		    hm.put("EMAIL ID", clsGlobalVarClass.gClientEmail);
+		    hm.put("Line", Linefor5);
+		}
+		else
+		{
+		    hm.put("TEL NO","");
+		    hm.put("EMAIL ID", "");
+		    hm.put("Line", "");
+		}
 
 		String query = "";
 		String SQL_BillHD = "";
@@ -705,7 +727,10 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		// funPrintTakeAway(billhd, billNo, BillOut);
 		if (flag_DirectBillerBlill)
 		{
-		    hm.put("POS", rs_BillHD.getString(14));
+		    if (billCount == 0)
+		    {
+			hm.put("POS", rs_BillHD.getString(14));
+		    }
 		    hm.put("BillNo", billNo);
 
 		    String orderNo = rs_BillHD.getString(15);
@@ -713,16 +738,18 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    {
 			hm.put("orderNo", "Your order no is " + orderNo);
 		    }
-
-		    if (clsGlobalVarClass.gPrintTimeOnBillYN)
+		    if (billCount == 0)
 		    {
-			SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy hh:mm a ");
-			hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(1)));
-		    }
-		    else
-		    {
-			SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy");
-			hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(1)));
+			if (clsGlobalVarClass.gPrintTimeOnBillYN)
+			{
+			    SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy hh:mm a ");
+			    hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(1)));
+			}
+			else
+			{
+			    SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy");
+			    hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(1)));
+			}
 		    }
 
 		    subTotal = rs_BillHD.getString(4);
@@ -733,31 +760,46 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		}
 		else
 		{
-		    hm.put("TABLE NAME", tblName);
+		    if (billCount == 0)
+		    {
+			hm.put("TABLE NAME", tblName);
+		    }
 
 		    if (waiterName.trim().length() > 0)
 		    {
-			hm.put("waiterName", waiterName);
+			if (billCount == 0)
+			{
+			    hm.put("waiterName", waiterName);
+			}
 		    }
-		    hm.put("POS", rs_BillHD.getString(16));
+		    if (billCount == 0)
+		    {
+			hm.put("POS", rs_BillHD.getString(16));
+		    }
 		    hm.put("BillNo", billNo);
-		    hm.put("PaxNo", rs_BillHD.getString(17));
+		    if (billCount == 0)
+		    {
+			hm.put("PaxNo", rs_BillHD.getString(17));
+		    }
 
 		    String orderNo = rs_BillHD.getString(18);
 		    if (clsGlobalVarClass.gPrintOrderNoOnBillYN)
 		    {
 			hm.put("orderNo", "Your Order No. Is:" + orderNo);
 		    }
+		    if (billCount == 0)
+		    {
+			if (clsGlobalVarClass.gPrintTimeOnBillYN)
+			{
+			    SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy hh:mm a ");
+			    hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(3)));
+			}
+			else
+			{
+			    SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy");
+			    hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(3)));
+			}
 
-		    if (clsGlobalVarClass.gPrintTimeOnBillYN)
-		    {
-			SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy hh:mm a ");
-			hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(3)));
-		    }
-		    else
-		    {
-			SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy");
-			hm.put("DATE_TIME", ft.format(rs_BillHD.getObject(3)));
 		    }
 
 		    subTotal = rs_BillHD.getString(6);
@@ -1106,7 +1148,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		{
 		    JRPrintPage object = (JRPrintPage) jp1pages.get(j);
 
-		    mainJaperPrint.addPage(0, object);//addPage(object);
+		    mainJaperPrint.addPage(billCount, object);//addPage(object);
 		}
 		isForInnerReport.close();
 

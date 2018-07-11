@@ -33,6 +33,7 @@ public class clsTextFormat1ForAdvReceipt implements clsAdvReceiptGenerationForma
     private clsUtility2 objUtility2 = new clsUtility2();
     private clsPrintingUtility objPrintingUtility = new clsPrintingUtility();
     private final String dashedLineFor40Chars = "  --------------------------------------";
+    private DecimalFormat gDecimalFormat = clsGlobalVarClass.funGetGlobalDecimalFormatter();
 
     /**
      *
@@ -448,7 +449,7 @@ public class clsTextFormat1ForAdvReceipt implements clsAdvReceiptGenerationForma
                 bal = 0.00;
             }
 
-            objPrintingUtility.funWriteTotal("BALANCE", String.valueOf(bal).concat("0"), advOut, "Format1");
+            objPrintingUtility.funWriteTotal("BALANCE",gDecimalFormat.format(bal).concat("0"), advOut, "Format1");
             advOut.newLine();
 
             //footer part

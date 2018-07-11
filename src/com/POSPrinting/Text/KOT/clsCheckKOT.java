@@ -51,7 +51,7 @@ public class clsCheckKOT
      * @param WaiterName
      * @param printYN
      */
-    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN)
+    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN,String KOTFrom)
     {
 	try
 	{
@@ -482,7 +482,14 @@ public class clsCheckKOT
 	    checkKotOut.close();
 	    fstream.close();
 
-	    objPrintingUtility.funShowTextFile(Text_Check_KOT, "", "");
+	    if (clsGlobalVarClass.gShowBill)
+	    {
+		objPrintingUtility.funShowTextFile(Text_Check_KOT, "", "");
+	    }else{
+		if(KOTFrom.equals("TableStatusView")){
+		    objPrintingUtility.funShowTextFile(Text_Check_KOT, "", "");
+		}
+	    }
 
 	    if (printYN.equalsIgnoreCase("Y"))
 	    {

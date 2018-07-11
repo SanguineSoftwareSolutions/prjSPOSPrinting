@@ -221,16 +221,16 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="55886318-c2f3-4bf7-911f-72caa1809e0f" width="13">
+					<jr:column uuid="55886318-c2f3-4bf7-911f-72caa1809e0f" width="23">
 						<jr:columnHeader height="15" rowSpan="1">
 							<line>
-								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="14" width="13" height="1"/>
+								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="14" width="23" height="1"/>
 								<graphicElement>
 									<pen lineWidth="0.5" lineStyle="Dashed"/>
 								</graphicElement>
 							</line>
 							<staticText>
-								<reportElement uuid="2ff3711a-f26d-42c7-bcc7-8913c067b85c" x="0" y="0" width="13" height="14"/>
+								<reportElement uuid="2ff3711a-f26d-42c7-bcc7-8913c067b85c" x="0" y="0" width="23" height="14"/>
 								<textElement textAlignment="Right">
 									<font fontName="Arial Narrow" isBold="false"/>
 								</textElement>
@@ -239,15 +239,22 @@
 						</jr:columnHeader>
 						<jr:columnFooter height="18" rowSpan="1">
 							<line>
-								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="0" width="13" height="1"/>
+								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="0" width="23" height="1"/>
 								<graphicElement>
 									<pen lineWidth="0.5" lineStyle="Dashed"/>
 								</graphicElement>
 							</line>
+							<staticText>
+								<reportElement uuid="b078e4b7-9965-44aa-8883-4ea88915a937" x="0" y="1" width="23" height="17"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial Narrow" size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[SUB]]></text>
+							</staticText>
 						</jr:columnFooter>
 						<jr:detailCell height="15" rowSpan="1">
 							<textField pattern="#.###">
-								<reportElement uuid="06914f88-ab30-4c05-b4aa-eae84be9e674" x="0" y="0" width="13" height="15"/>
+								<reportElement uuid="06914f88-ab30-4c05-b4aa-eae84be9e674" x="0" y="0" width="23" height="15"/>
 								<textElement textAlignment="Right" verticalAlignment="Top">
 									<font fontName="Arial Narrow" isBold="false"/>
 								</textElement>
@@ -255,17 +262,17 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="4338ac94-46b7-46fe-89a0-fcb0f01934a7" width="45">
+					<jr:column uuid="4338ac94-46b7-46fe-89a0-fcb0f01934a7" width="34">
 						<jr:columnHeader height="15" rowSpan="1">
 							<staticText>
-								<reportElement uuid="73a3e560-f23a-475d-96df-f600cf0675ba" x="0" y="0" width="45" height="14"/>
+								<reportElement uuid="73a3e560-f23a-475d-96df-f600cf0675ba" x="0" y="0" width="34" height="14"/>
 								<textElement textAlignment="Right">
 									<font fontName="Arial Narrow" isBold="false"/>
 								</textElement>
 								<text><![CDATA[Rate]]></text>
 							</staticText>
 							<line>
-								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="14" width="45" height="1"/>
+								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="14" width="34" height="1"/>
 								<graphicElement>
 									<pen lineWidth="0.5" lineStyle="Dashed"/>
 								</graphicElement>
@@ -273,22 +280,22 @@
 						</jr:columnHeader>
 						<jr:columnFooter height="18" rowSpan="1">
 							<line>
-								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="0" width="45" height="1"/>
+								<reportElement uuid="143a6a1d-cd77-4f1e-b2ca-96ee704d77d2" x="0" y="0" width="34" height="1"/>
 								<graphicElement>
 									<pen lineWidth="0.5" lineStyle="Dashed"/>
 								</graphicElement>
 							</line>
 							<staticText>
-								<reportElement uuid="b078e4b7-9965-44aa-8883-4ea88915a937" x="0" y="1" width="45" height="17"/>
+								<reportElement uuid="b078e4b7-9965-44aa-8883-4ea88915a937" x="0" y="1" width="34" height="17"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font fontName="Arial Narrow" isBold="true"/>
 								</textElement>
-								<text><![CDATA[SUBTOTAL :]]></text>
+								<text><![CDATA[TOTAL :]]></text>
 							</staticText>
 						</jr:columnFooter>
 						<jr:detailCell height="15" rowSpan="1">
 							<textField>
-								<reportElement uuid="06914f88-ab30-4c05-b4aa-eae84be9e674" x="0" y="0" width="45" height="15"/>
+								<reportElement uuid="06914f88-ab30-4c05-b4aa-eae84be9e674" x="0" y="0" width="34" height="15"/>
 								<textElement textAlignment="Right" verticalAlignment="Top">
 									<font fontName="Arial Narrow" isBold="false"/>
 								</textElement>

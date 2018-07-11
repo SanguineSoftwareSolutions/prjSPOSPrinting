@@ -110,14 +110,18 @@ public class clsKOTGeneration
 		    }
 		    rsAreaCode.close();
 		    sql = "select a.strItemName,a.strNCKotYN,d.strCostCenterCode,d.strPrimaryPrinterPort,d.strSecondaryPrinterPort,d.strCostCenterName "
-			    + " ,ifnull(e.strLabelOnKOT,'KOT') strLabelOnKOT "
+			    + " ,ifnull(e.strLabelOnKOT,'KOT') strLabelOnKOT,sum(a.dblPrintQty) "
 			    + " from tblitemrtemp a "
 			    + " left outer join " + pricingTable + " c on a.strItemCode = c.strItemCode "
 			    + " left outer join tblprintersetup d on c.strCostCenterCode=d.strCostCenterCode "
 			    + " left outer join tblcostcentermaster e on c.strCostCenterCode=e.strCostCenterCode  "
 			    + " where a.strKOTNo=? and a.strTableNo=? and (c.strPosCode=? or c.strPosCode='All') "
 			    + " and (c.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? ) OR c.strAreaCode =?) "
-			    + " group by d.strCostCenterCode";
+			    + " group by d.strCostCenterCode ";
+		    if(clsGlobalVarClass.gFireCommunication)
+		    {
+			sql=sql+" having sum(a.dblPrintQty)>0 ";
+		    }		    		    
 		    pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sql);
 		    pst.setString(1, KOTNo);
 		    pst.setString(2, tableNo);
@@ -224,10 +228,10 @@ public class clsKOTGeneration
      * @param WaiterName
      * @param printYN
      */
-    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN)
+    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN,String KOTFrom)
     {
 	clsCheckKOT objCheckKOT = new clsCheckKOT();
-	objCheckKOT.funCkeckKotTextFile(TableNo, WaiterName, printYN);
+	objCheckKOT.funCkeckKotTextFile(TableNo, WaiterName, printYN,KOTFrom);
     }
     
      /**

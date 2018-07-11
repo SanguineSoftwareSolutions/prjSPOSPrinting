@@ -150,8 +150,10 @@ public class clsPrintingUtility
 	    {
 		name = "DayEnd";
 	    }
-	    new frmShowTextFile(data, name, file, printerInfo).setVisible(true);
 	    fread.close();
+	    KOTIn.close();
+	    new frmShowTextFile(data, name, file, printerInfo).setVisible(true);
+	    
 	}
 	catch (Exception e)
 	{

@@ -169,6 +169,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    String tblName = "";
 	    ResultSet rs_BillHD = null;
 	    boolean flgComplimentaryBill = false;
+	    double dblUSDRateConvertion = 0.00;
 
 	    StringBuilder sqlBillHeaderDtl = new StringBuilder();
 	    sqlBillHeaderDtl.append("select ifnull(a.strTableNo,''),ifnull(a.strWaiterNo,''),a.dteBillDate,time(a.dteBillDate),a.dblDiscountAmt,a.dblSubTotal,"
@@ -177,7 +178,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    + ",ifnull(c.strTableName,''),ifnull(d.strWShortName,''),ifnull(d.strWFullName,''),ifnull(l.strSettelmentType,''),ifnull(j.strReasonName,'') as voidedReason, "
 		    + "ifnull(g.strReasonName,''),ifnull(e.strCustomerName,''),ifnull(a.strAdvBookingNo,''),ifnull(h.strMessage,''),ifnull(h.strShape,''),ifnull(h.strNote,''),ifnull(a.dblTipAmount,0.00) "
 		    + ",a.strOperationType,ifnull(a.strTakeAwayRemarks,''),ifnull(e.longMobileNo,''),ifnull(m.strCustType,''),ifnull(e.strExternalCode,'')"
-		    + ",ifnull(DATE_FORMAT(date(e.dteDOB),'%d-%m-%Y'),''),ifnull(e.strGSTNo,'')  "
+		    + ",ifnull(DATE_FORMAT(date(e.dteDOB),'%d-%m-%Y'),''),ifnull(e.strGSTNo,''),a.strKOTToBillNote,dblUSDConverionRate  "
 		    + "from " + billhd + " a "
 		    + "left outer join tblposmaster b on a.strposCode=b.strPosCode  "
 		    + "left outer join tbltablemaster c on a.strTableNo=c.strTableNo and a.strClientCode=c.strClientCode "
@@ -207,6 +208,8 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    }
 	    FileWriter fstream_bill = new FileWriter(Text_Bill);
 	    BufferedWriter BillOut = new BufferedWriter(fstream_bill);
+
+	    dblUSDRateConvertion = rs_BillHD.getDouble(38);
 
 	    if (clsGlobalVarClass.gClientCode.equals("117.001"))
 	    {
@@ -768,6 +771,79 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    BillOut.newLine();
 		}
 	    }
+	    else if (clsGlobalVarClass.gClientCode.equals("251.001"))//Tribe Hospitality
+	    {
+
+		String licenseName = "NOMAD THE LOUNGE BAR";
+
+		objPrintingUtility.funPrintBlankSpace(licenseName, BillOut);
+
+		BillOut.write(licenseName);
+		BillOut.newLine();
+		objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress1, BillOut);
+		BillOut.write(clsGlobalVarClass.gClientAddress1.toUpperCase());
+		BillOut.newLine();
+		if (clsGlobalVarClass.gClientAddress2.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress2, BillOut);
+		    BillOut.write(clsGlobalVarClass.gClientAddress2.toUpperCase());
+		    BillOut.newLine();
+		}
+		if (clsGlobalVarClass.gClientAddress3.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress3, BillOut);
+		    BillOut.write(clsGlobalVarClass.gClientAddress3.toUpperCase());
+		    BillOut.newLine();
+		}
+		if (clsGlobalVarClass.gCityName.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gCityName, BillOut);
+		    BillOut.write(clsGlobalVarClass.gCityName.toUpperCase());
+		    BillOut.newLine();
+		}
+	    }
+	    else if (clsGlobalVarClass.gClientCode.equals("048.001"))//MURPHIES
+	    {
+
+		String licenseName = clsGlobalVarClass.gClientName;
+		if (billNo.startsWith("F"))//Food bill license name
+		{
+		    licenseName = "JAI SANTOSHI MAA HOSPITALITY";
+		}
+		else if (billNo.startsWith("L"))//Liquor bill license name
+		{
+		    licenseName = "SHRI SIDDHI VINAYAK FOODS";
+		}
+		else
+		{
+		    licenseName = clsGlobalVarClass.gClientName;
+		}
+		objPrintingUtility.funPrintBlankSpace(licenseName, BillOut);
+
+		BillOut.write(licenseName);
+		BillOut.newLine();
+		objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress1, BillOut);
+		BillOut.write(clsGlobalVarClass.gClientAddress1.toUpperCase());
+		BillOut.newLine();
+		if (clsGlobalVarClass.gClientAddress2.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress2, BillOut);
+		    BillOut.write(clsGlobalVarClass.gClientAddress2.toUpperCase());
+		    BillOut.newLine();
+		}
+		if (clsGlobalVarClass.gClientAddress3.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientAddress3, BillOut);
+		    BillOut.write(clsGlobalVarClass.gClientAddress3.toUpperCase());
+		    BillOut.newLine();
+		}
+		if (clsGlobalVarClass.gCityName.trim().length() > 0)
+		{
+		    objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gCityName, BillOut);
+		    BillOut.write(clsGlobalVarClass.gCityName.toUpperCase());
+		    BillOut.newLine();
+		}
+	    }
 	    else
 	    {
 		objPrintingUtility.funPrintBlankSpace(clsGlobalVarClass.gClientName, BillOut);
@@ -811,7 +887,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		BillOut.write(clsGlobalVarClass.gClientEmail);
 		BillOut.newLine();
 	    }
-	    
+
 	    tblName = rs_BillHD.getString(18);
 	    if (tblName.length() > 0)
 	    {
@@ -833,6 +909,15 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		BillOut.write(waiterName);
 		BillOut.newLine();
 	    }
+
+	    String kotToBillNote = rs_BillHD.getString(37);
+	    if (kotToBillNote.trim().length() > 0)
+	    {
+		BillOut.write("  ZOMATO CODE:" + "  ");
+		BillOut.write(kotToBillNote);
+		BillOut.newLine();
+	    }
+
 	    BillOut.write(Linefor5);
 	    BillOut.newLine();
 	    BillOut.write("  POS         : ");
@@ -1187,8 +1272,6 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		}
 		rsComplimentaryItems.close();
 
-		
-
 		String qty = String.valueOf(saleQty);
 		if (saleQty == 0 && flgComplBill)
 		{
@@ -1272,16 +1355,29 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 			    ResultSet rs_modifierRecord = pst.executeQuery();
 			    while (rs_modifierRecord.next())
 			    {
-				if (flgComplimentaryBill)
+
+				double modifierAmt = rs_modifierRecord.getDouble(3);
+				int modifierQty = rs_modifierRecord.getInt(2);
+				if (modifierAmt > 0)
 				{
-				    objPrintingUtility.funWriteToTextformat5(BillOut, "", rs_modifierRecord.getString(1).toUpperCase(), "0.00", "Format5");
-				    BillOut.newLine();
+				    objPrintingUtility.funPrintContentWithSpace("Right", String.valueOf(modifierQty), 8, BillOut);//Qty Print
+				    BillOut.write(" ");
 				}
 				else
 				{
-				    objPrintingUtility.funWriteToTextformat5(BillOut, "", rs_modifierRecord.getString(1).toUpperCase(), gDecimalFormat.format(rs_modifierRecord.getDouble(3)), "Format5");
-				    BillOut.newLine();
+				    objPrintingUtility.funPrintContentWithSpace("Right", "", 8, BillOut);//Qty Print
+				    BillOut.write(" ");
 				}
+				objPrintingUtility.funPrintContentWithSpace("Left", rs_modifierRecord.getString(1).toUpperCase(), 22, BillOut);//Item Name
+				if (flgComplimentaryBill)
+				{
+				    objPrintingUtility.funPrintContentWithSpace("Right", "0.00", 9, BillOut);//Amount
+				}
+				else
+				{
+				    objPrintingUtility.funPrintContentWithSpace("Right", gDecimalFormat.format(rs_modifierRecord.getDouble(3)), 9, BillOut);//Amount
+				}
+				BillOut.newLine();
 			    }
 			    rs_modifierRecord.close();
 			}
@@ -1440,15 +1536,26 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    }
 	    BillOut.write(Linefor5);
 	    BillOut.newLine();
+
 	    if (flgComplimentaryBill)
 	    {
 		objPrintingUtility.funWriteTotal("TOTAL(ROUNDED)", gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
+		if (dblUSDRateConvertion > 0)
+		{
+		    BillOut.newLine();
+		    objPrintingUtility.funWriteTotal("USD", "$ " + gDecimalFormat.format(Double.parseDouble(grandTotal) / dblUSDRateConvertion), BillOut, "Format5");
+		}
 		BillOut.newLine();
 		BillOut.write(Linefor5);
 	    }
 	    else
 	    {
 		objPrintingUtility.funWriteTotal("TOTAL(ROUNDED)", gDecimalFormat.format(Double.parseDouble(grandTotal)), BillOut, "Format5");
+		if (dblUSDRateConvertion > 0)
+		{
+		    BillOut.newLine();
+		    objPrintingUtility.funWriteTotal("USD", "$ " + gDecimalFormat.format(Double.parseDouble(grandTotal) / dblUSDRateConvertion), BillOut, "Format5");
+		}
 		BillOut.newLine();
 		BillOut.write(Linefor5);
 	    }
@@ -1487,13 +1594,22 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 				    BillOut.newLine();
 				    objPrintingUtility.funWriteTotal(dtlBillSeriesBillNo[i] + " TOTAL(ROUNDED)", rsPrintGT.getString(2), BillOut, "Format5");
 				    dblOtherBillsGT += rsPrintGT.getDouble(2);
-				    BillOut.newLine();
+				    if (dblUSDRateConvertion > 0)
+				    {
+					BillOut.newLine();
+					objPrintingUtility.funWriteTotal(dtlBillSeriesBillNo[i] + " USD", "$ " + gDecimalFormat.format((rsPrintGT.getDouble(2) / dblUSDRateConvertion)), BillOut, "Format5");
+				    }
 				}
 			    }
 			    BillOut.newLine();
 			    BillOut.write(Linefor5);
 			    BillOut.newLine();
 			    objPrintingUtility.funWriteTotal("GRAND TOTAL(ROUNDED)", gDecimalFormat.format(dblOtherBillsGT), BillOut, "Format5");
+			    if (dblUSDRateConvertion > 0)
+			    {
+				BillOut.newLine();
+				objPrintingUtility.funWriteTotal("USD", "$ " + gDecimalFormat.format((dblOtherBillsGT / dblUSDRateConvertion)), BillOut, "Format5");
+			    }
 			    BillOut.newLine();
 			    BillOut.write(Linefor5);
 			    BillOut.newLine();
@@ -1586,7 +1702,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    + " and date(b.dteBillDate)='" + billDate + "' "
 		    + " group by a.strBillNo";
 	    ResultSet rsTenderAmt = clsGlobalVarClass.dbMysql.executeResultSet(sqlTenderAmt);
-	    if (rsTenderAmt.next())
+	    if (rsTenderAmt.next() && !creditSettlement)
 	    {
 		BillOut.newLine();
 		if (flgComplimentaryBill)

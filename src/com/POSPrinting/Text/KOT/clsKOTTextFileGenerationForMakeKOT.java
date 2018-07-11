@@ -60,7 +60,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    String filePath = System.getProperty("user.dir");
 	    File fileKOTPrint = new File(filePath + "/Temp/Temp_KOT.txt");
 	    FileWriter fstream = new FileWriter(fileKOTPrint);
-	    BufferedWriter KotOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileKOTPrint), "UTF8"));
+	    BufferedWriter KotOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileKOTPrint), "UTF-8"));
 
 	    boolean isReprint = false;
 	    if ("Reprint".equalsIgnoreCase(Reprint))
@@ -503,7 +503,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    String filePath = System.getProperty("user.dir");
 	    File fileKOTPrint = new File(filePath + "/Temp/Temp_KOT.txt");
 	    FileWriter fstream = new FileWriter(fileKOTPrint);
-	    BufferedWriter KotOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileKOTPrint), "UTF8"));
+	    BufferedWriter KotOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileKOTPrint), "UTF-8"));
 
 	    DecimalFormat decimalFormat = new DecimalFormat("#.###");
 
@@ -564,7 +564,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    String areaCodeOfTable = "";
 	    String sqlArea = "select strTableName,intPaxNo,strAreaCode "
 		    + " from tbltablemaster "
-		    + " where strTableNo='"+tableNo+"' "
+		    + " where strTableNo='" + tableNo + "' "
 		    + " and strOperational='Y' ";
 	    ResultSet rsArea = clsGlobalVarClass.dbMysql.executeResultSet(sqlArea);
 	    if (rsArea.next())
@@ -591,16 +591,16 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    if (rsKOTDetails.next())
 	    {
 		KotOut.newLine();
-		KotOut.write("  TABLE No   :");
+		KotOut.write("  TABLE No         :");
 		KotOut.write(rsKOTDetails.getString(2) + "  ");
 
 		if (clsGlobalVarClass.gPrintDeviceAndUserDtlOnKOTYN)
 		{
-		    KotOut.write(" PAX   :");
+		    KotOut.write(" PAX : ");
 		    KotOut.write(rsKOTDetails.getString(3));
 
 		    KotOut.newLine();
-		    KotOut.write("  KOT NO     :");
+		    KotOut.write("  KOT NO           :");
 		    KotOut.write(KOTNO + "  ");
 		}
 
@@ -610,28 +610,16 @@ public class clsKOTTextFileGenerationForMakeKOT
 		    {
 			waiterNameForConsolidatedKOT = rsKOTDetails.getString(4);
 			KotOut.newLine();
-			KotOut.write("  WAITER NAME:" + "   " + rsKOTDetails.getString(4));
+			KotOut.write("  WAITER NAME      :" + "" + rsKOTDetails.getString(4));
 
 		    }
 
 		}
 		SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a ");
 		KotOut.newLine();
-		KotOut.write("  DATE & TIME:" + dateTimeFormat.format(rsKOTDetails.getObject(5)));
+		KotOut.write("  DATE & TIME      :" + dateTimeFormat.format(rsKOTDetails.getObject(5)));
 	    }
 	    rsKOTDetails.close();
-
-	    if ("Y".equalsIgnoreCase(NCKotYN))
-	    {
-		String sql = "select a.strRemark from tblnonchargablekot a where a.strKOTNo='" + KOTNO + "' "
-			+ "group by a.strKOTNo ";
-		ResultSet rsRemark = clsGlobalVarClass.dbMysql.executeResultSet(sql);
-		if (rsRemark.next() && rsRemark.getString(1).trim().length() > 0)
-		{
-		    KotOut.newLine();
-		    KotOut.write("  Remark     :" + rsRemark.getString(1));
-		}
-	    }
 
 	    InetAddress ipAddress = InetAddress.getLocalHost();
 	    String hostName = ipAddress.getHostName();
@@ -642,6 +630,49 @@ public class clsKOTTextFileGenerationForMakeKOT
 		KotOut.write("  KOT From Computer:" + hostName);
 		KotOut.newLine();
 		KotOut.write("  KOT By User      :" + clsGlobalVarClass.gUserCode);
+	    }
+
+	    if ("Y".equalsIgnoreCase(NCKotYN))
+	    {
+		String sql = "select a.strRemark from tblnonchargablekot a where a.strKOTNo='" + KOTNO + "' "
+			+ "group by a.strKOTNo ";
+		ResultSet rsRemark = clsGlobalVarClass.dbMysql.executeResultSet(sql);
+		if (rsRemark.next() && rsRemark.getString(1).trim().length() > 0)
+		{
+		    KotOut.newLine();
+		    KotOut.write("  Remark : " + rsRemark.getString(1));
+		}
+	    }
+
+	    StringBuilder sqlBuilder = new StringBuilder();
+	    StringBuilder billNoteBuilder = new StringBuilder();
+
+	    sqlBuilder.setLength(0);
+	    sqlBuilder.append("select a.strBillNote "
+		    + "from tblitemrtemp a "
+		    + "where a.strTableNo='" + tableNo + "' "
+		    + "and a.strPOSCode='" + clsGlobalVarClass.gPOSCode + "' "
+		    + "and length(a.strBillNote)>0 "
+		    + "and a.strKOTNo='" + KOTNO + "' "
+		    + "group by a.strBillNote ");
+	    billNoteBuilder.setLength(0);
+	    ResultSet rsBillNoteBuilder = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
+	    for (int i = 0; rsBillNoteBuilder.next(); i++)
+	    {
+		if (i == 0)
+		{
+		    billNoteBuilder.append(rsBillNoteBuilder.getString(1));
+		}
+		else
+		{
+		    billNoteBuilder.append("," + rsBillNoteBuilder.getString(1));
+		}
+	    }
+	    rsBillNoteBuilder.close();
+	    if (billNoteBuilder.toString().trim().length() > 0)
+	    {
+		KotOut.newLine();
+		KotOut.write("  Zomato Code      :" + billNoteBuilder.toString().trim());
 	    }
 
 	    if (clsGlobalVarClass.gPrintDeviceAndUserDtlOnKOTYN)
@@ -655,22 +686,30 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    KotOut.write(dashedLineFor40Chars);
 
 	    // Code to Print KOT Item details    
-	    String sqlKOTItems = "";
+	    String sqlKOTItems = "", filter = "";
+
+	    String printItemQty = "a.dblItemQuantity";
+	    if (clsGlobalVarClass.gFireCommunication)
+	    {
+		printItemQty = "a.dblPrintQty";
+		filter = " and a.dblPrintQty>0 ";
+	    }
 
 	    if (clsGlobalVarClass.gAreaWisePricing.equals("Y"))
 	    {
-		sqlKOTItems = "select LEFT(a.strItemCode,7),b.strItemName,a.dblItemQuantity,a.strKOTNo,a.strSerialNo,d.strShortName "
+		sqlKOTItems = "select LEFT(a.strItemCode,7),b.strItemName," + printItemQty + ",a.strKOTNo,a.strSerialNo,d.strShortName "
 			+ " from tblitemrtemp a,tblmenuitempricingdtl b,tblprintersetup c,tblitemmaster d "
 			+ " where a.strTableNo=? and a.strKOTNo=? and b.strCostCenterCode=c.strCostCenterCode "
 			+ " and b.strCostCenterCode=? and a.strItemCode=d.strItemCode "
 			+ " and (b.strPOSCode=? or b.strPOSCode='All') "
 			+ " and (b.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? )) "
 			+ " and LEFT(a.strItemCode,7)=b.strItemCode and b.strHourlyPricing='No' "
+			+ " " + filter
 			+ " order by a.strSerialNo ";
 	    }
 	    else
 	    {
-		sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName,a.dblItemQuantity,a.strKOTNo,a.strSerialNo,d.strShortName "
+		sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName," + printItemQty + ",a.strKOTNo,a.strSerialNo,d.strShortName "
 			+ " from tblitemrtemp a,tblmenuitempricingdtl b,tblprintersetup c,tblitemmaster d "
 			+ " where a.strTableNo=? and a.strKOTNo=? and b.strCostCenterCode=c.strCostCenterCode "
 			+ " and b.strCostCenterCode=? and a.strItemCode=d.strItemCode "
@@ -678,6 +717,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 			+ " and (b.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? ) "
 			+ " OR b.strAreaCode ='" + areaCode + "') "
 			+ " and LEFT(a.strItemCode,7)=b.strItemCode and b.strHourlyPricing='No' "
+			+ " " + filter
 			+ " order by a.strSerialNo ";
 	    }
 
@@ -685,18 +725,19 @@ public class clsKOTTextFileGenerationForMakeKOT
 	    {
 		if (clsGlobalVarClass.gAreaWisePricing.equals("Y"))
 		{
-		    sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName,a.dblItemQuantity,a.strKOTNo,a.strSerialNo,d.strShortName "
+		    sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName," + printItemQty + ",a.strKOTNo,a.strSerialNo,d.strShortName "
 			    + " from tblitemrtemp a,tblplayzonepricinghd b,tblprintersetup c,tblitemmaster d "
 			    + " where a.strTableNo=? and a.strKOTNo=? and b.strCostCenterCode=c.strCostCenterCode "
 			    + " and b.strCostCenterCode=? and a.strItemCode=d.strItemCode "
 			    + " and (b.strPOSCode=? or b.strPOSCode='All') "
 			    + " and (b.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? )) "
 			    + " and LEFT(a.strItemCode,7)=b.strItemCode "
+			    + " " + filter
 			    + " order by a.strSerialNo ";
 		}
 		else
 		{
-		    sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName,a.dblItemQuantity,a.strKOTNo,a.strSerialNo,d.strShortName "
+		    sqlKOTItems = "select LEFT(a.strItemCode,7),d.strItemName," + printItemQty + ",a.strKOTNo,a.strSerialNo,d.strShortName "
 			    + " from tblitemrtemp a,tblplayzonepricinghd b,tblprintersetup c,tblitemmaster d "
 			    + " where a.strTableNo=? and a.strKOTNo=? and b.strCostCenterCode=c.strCostCenterCode "
 			    + " and b.strCostCenterCode=? and a.strItemCode=d.strItemCode "
@@ -704,6 +745,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 			    + " and (b.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? ) "
 			    + " OR b.strAreaCode ='" + areaCode + "') "
 			    + " and LEFT(a.strItemCode,7)=b.strItemCode "
+			    + " " + filter
 			    + " order by a.strSerialNo ";
 		}
 	    }
@@ -761,9 +803,17 @@ public class clsKOTTextFileGenerationForMakeKOT
 		    }
 		}
 
-		String sqlModifier = "select a.strItemName,sum(a.dblItemQuantity) from tblitemrtemp a "
+		String printModifierQty = "a.dblItemQuantity";
+		if (clsGlobalVarClass.gFireCommunication)
+		{
+		    printModifierQty = "a.dblPrintQty";
+		}
+
+		String sqlModifier = "select a.strItemName," + printModifierQty + " "
+			+ " from tblitemrtemp a "
 			+ " where a.strItemCode like'" + rsKOTItems.getString(1) + "M%' and a.strKOTNo='" + KOTNO + "' "
 			+ " and strSerialNo like'" + rsKOTItems.getString(5) + ".%' "
+			+ " " + filter
 			+ " group by a.strItemCode,a.strItemName ";
 		//System.out.println(sqlModifier);
 		ResultSet rsModifierItems = clsGlobalVarClass.dbMysql.executeResultSet(sqlModifier);

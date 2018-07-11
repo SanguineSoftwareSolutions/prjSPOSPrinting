@@ -170,7 +170,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    + ",ifnull(dblDeliveryCharges,0.00),ifnull(i.dblAdvDeposite,0.00),a.dblDiscountPer,b.strPOSName,a.intPaxNo "
 		    + ",ifnull(c.strTableName,''),ifnull(d.strWShortName,''),ifnull(d.strWFullName,''),ifnull(l.strSettelmentType,''),ifnull(j.strReasonName,'') as voidedReason, "
 		    + "ifnull(g.strReasonName,''),ifnull(e.strCustomerName,''),ifnull(a.strAdvBookingNo,''),ifnull(h.strMessage,''),ifnull(h.strShape,''),ifnull(h.strNote,''),ifnull(a.dblTipAmount,0.00) "
-		    + ",a.strOperationType,ifnull(a.strTakeAwayRemarks,''),ifnull(e.longMobileNo,'')  "
+		    + ",a.strOperationType,ifnull(a.strTakeAwayRemarks,''),ifnull(e.longMobileNo,''),a.strKOTToBillNote  "
 		    + "from " + billhd + " a "
 		    + "left outer join tblposmaster b on a.strPOSCode=b.strPosCode  "
 		    + "left outer join tbltablemaster c on a.strTableNo=c.strTableNo and a.strClientCode=c.strClientCode "
@@ -576,6 +576,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 	    BillOut.write(clsGlobalVarClass.gClientEmail);
 	    BillOut.newLine();
 	    tblName = rs_BillHD.getString(18);
+	    String kotToBillNote = rs_BillHD.getString(33);
 	    if (tblName.length() > 0)
 	    {
 		if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("136.001"))//KINKI
@@ -596,6 +597,17 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		BillOut.write(waiterName);
 		BillOut.newLine();
 	    }
+	    
+	     if (kotToBillNote.trim().length() > 0)
+	    {
+		BillOut.write("  ZOMATO CODE :" + "  ");
+		BillOut.write(kotToBillNote);
+		BillOut.newLine();
+	    }
+	    
+	    
+	    
+	    
 	    BillOut.write(Linefor5);
 	    BillOut.newLine();
 	    BillOut.write("  POS         : ");
