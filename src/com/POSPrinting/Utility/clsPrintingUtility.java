@@ -153,7 +153,7 @@ public class clsPrintingUtility
 	    fread.close();
 	    KOTIn.close();
 	    new frmShowTextFile(data, name, file, printerInfo).setVisible(true);
-	    
+
 	}
 	catch (Exception e)
 	{
@@ -1504,6 +1504,53 @@ public class clsPrintingUtility
 		objBillOut.write(objUtility.funPrintTextWithAlignment("0", 7, "Right"));
 		objBillOut.newLine();
 	    }
+	}
+	rsBillComplItemDtl.close();
+	objUtility = null;
+	return 1;
+    }
+
+    /**
+     *
+     * @param billNo
+     * @param objBillOut
+     * @param billPrintSize
+     * @param POSCode
+     * @param billDate
+     * @param sbZeroAmtItems
+     * @return
+     * @throws Exception
+     */
+    public int funPrintComplimentaryItemsInBill(String billNo, List<clsBillDtl> listOfBillDetail, int billPrintSize, String POSCode, String billDate, StringBuilder sbZeroAmtItems) throws Exception
+    {
+	if (sbZeroAmtItems.length() > 0)
+	{
+	    sbZeroAmtItems = sbZeroAmtItems.delete(0, 1);
+	}
+	clsUtility objUtility = new clsUtility();
+	String sqlBillComplDtl = "select b.strItemName,b.dblQuantity "
+		+ " from tblbillhd a,tblbillcomplementrydtl b "
+		+ " where a.strBillNo=b.strBillNo and a.strClientCode=b.strClientCode "
+		+ " and date(a.dteBillDate)=date(b.dteBillDate) and a.strBillNo='" + billNo + "' "
+		+ " and a.strPOSCode='" + POSCode + "'  and date(a.dteBillDate)='" + billDate + "' "
+		+ " and a.strClientCode='" + clsGlobalVarClass.gClientCode + "' and b.strType='ItemComplimentary' ";
+	if (clsGlobalVarClass.gPrintOpenItemsOnBill)
+	{
+	    if (sbZeroAmtItems.length() > 0)
+	    {
+		sqlBillComplDtl = sqlBillComplDtl + " and b.strItemCode not in (" + sbZeroAmtItems + ") ";
+	    }
+	}
+
+	ResultSet rsBillComplItemDtl = clsGlobalVarClass.dbMysql.executeResultSet(sqlBillComplDtl);
+	while (rsBillComplItemDtl.next())
+	{
+	    clsBillDtl objBillDtl = new clsBillDtl();
+	    objBillDtl.setDblQuantity(rsBillComplItemDtl.getDouble(2));
+	    objBillDtl.setDblAmount(0.0);
+	    objBillDtl.setStrItemName(rsBillComplItemDtl.getString(1).toUpperCase());
+
+	    listOfBillDetail.add(objBillDtl);
 	}
 	rsBillComplItemDtl.close();
 	objUtility = null;

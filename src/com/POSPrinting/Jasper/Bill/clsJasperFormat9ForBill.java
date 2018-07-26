@@ -86,6 +86,8 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 	    String billDscFrom = "tblbilldiscdtl";
 	    String billPromoDtl = "tblbillpromotiondtl";
 	    String billType = " ";
+	    String billComplDtl = null;
+	    billComplDtl = "tblbillcomplementrydtl";
 
 	    if (clsGlobalVarClass.gHOPOSType.equalsIgnoreCase("HOPOS"))
 	    {
@@ -96,6 +98,7 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		billtaxdtl = "tblqbilltaxdtl";
 		billDscFrom = "tblqbilldiscdtl";
 		billPromoDtl = "tblqbillpromotiondtl";
+		billComplDtl = "tblqbillcomplementrydtl";
 	    }
 	    else
 	    {
@@ -108,6 +111,7 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		    billtaxdtl = "tblbilltaxdtl";
 		    billDscFrom = "tblbilldiscdtl";
 		    billPromoDtl = "tblbillpromotiondtl";
+		    billComplDtl = "tblbillcomplementrydtl";
 
 		    long dateDiff = new clsUtility().funCompareDate(billDate, objUtility.funGetPOSDateForTransaction());
 		    if (dateDiff > 0)
@@ -119,6 +123,8 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 			billtaxdtl = "tblqbilltaxdtl";
 			billDscFrom = "tblqbilldiscdtl";
 			billPromoDtl = "tblqbillpromotiondtl";
+			billComplDtl = "tblqbillcomplementrydtl";
+
 		    }
 
 		    String sql = "select count(strBillNo) from tblbillhd where strBillNo='" + billNo + "' ";
@@ -134,6 +140,7 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 			billtaxdtl = "tblqbilltaxdtl";
 			billDscFrom = "tblqbilldiscdtl";
 			billPromoDtl = "tblqbillpromotiondtl";
+			billComplDtl = "tblqbillcomplementrydtl";
 		    }
 		}
 		else
@@ -144,6 +151,7 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		    billSettlementdtl = "tblbillsettlementdtl";
 		    billtaxdtl = "tblbilltaxdtl";
 		    billPromoDtl = "tblbillpromotiondtl";
+		    billComplDtl = "tblqbillcomplementrydtl";
 		}
 	    }
 
@@ -763,6 +771,8 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		objBillDtl.setDblAmount(grandTotal);
 		listOfGrandTotalDtl.add(objBillDtl);
 
+		StringBuilder sbZeroAmtItems = new StringBuilder();
+
 		List<clsBillDtl> listOfBillDetail = new ArrayList<>();
 		String SQL_BillDtl = "select sum(a.dblQuantity),a.strItemName as ItemLine1"
 			+ " ,MID(a.strItemName,23,LENGTH(a.strItemName)) as ItemLine2"
@@ -780,6 +790,13 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		ResultSet rs_BillDtl = pst.executeQuery();
 		while (rs_BillDtl.next())
 		{
+		    double amt = rs_BillDtl.getDouble(4);
+		    if (amt == 0)
+		    {
+			sbZeroAmtItems.append(",");
+			sbZeroAmtItems.append("'" + rs_BillDtl.getString(5) + "'");
+		    }
+
 		    double saleQty = rs_BillDtl.getDouble(1);
 		    String sqlPromoBills = "select dblQuantity from " + billPromoDtl + " "
 			    + " where strBillNo='" + billNo + "' and strItemCode='" + rs_BillDtl.getString(5) + "' "
@@ -790,6 +807,20 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 			saleQty -= rsPromoItems.getDouble(1);
 		    }
 		    rsPromoItems.close();
+
+		    String sqlCompliBills = "select dblQuantity from " + billComplDtl + " "
+			    + " where strBillNo='" + billNo + "' "
+			    + " and strItemCode='" + rs_BillDtl.getString(5) + "' "
+			    + " and strType='ItemComplimentary' "
+			    + " and date(dteBillDate)='" + billDate + "' ";
+		    ResultSet rsComplimentaryItems = clsGlobalVarClass.dbMysql.executeResultSet(sqlCompliBills);
+		    double compliQty = 1;
+		    if (rsComplimentaryItems.next())
+		    {
+			saleQty -= rsComplimentaryItems.getDouble(1);
+			compliQty = rsComplimentaryItems.getDouble(1);;			
+		    }
+		    rsComplimentaryItems.close();
 
 		    String qty = String.valueOf(saleQty);
 		    if (qty.contains("."))
@@ -868,6 +899,7 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		rs_BillDtl.close();
 
 		objPrintingUtility.funPrintPromoItemsInBill(billNo, 4, listOfBillDetail);  // Print Promotion Items in Bill for this billno.
+		objPrintingUtility.funPrintComplimentaryItemsInBill(billNo, listOfBillDetail, 4, posCode, billDate, sbZeroAmtItems);
 
 		List<clsBillDtl> listOfDiscountDtl = new ArrayList<>();
 
@@ -1169,6 +1201,20 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		    dblAllBillGrandTotal += billTotal;
 		    listSummaryBillDtl.add(objBillDtl);
 		}
+		else
+		{
+		    sqlBillNos = "select a.dblGrandTotal "
+			    + "from " + billhd + " a "
+			    + "where a.strBillNo='" + arrListBillNos.get(billCount) + "' "
+			    + "and date(a.dteBillDate)='" + billDate + "' ";
+		    rsDtlBillNos = clsGlobalVarClass.dbMysql.executeResultSet(sqlBillNos);
+		    if (rsDtlBillNos.next())
+		    {
+			double billTotal = rsDtlBillNos.getDouble(1);
+
+			dblAllBillGrandTotal += billTotal;
+		    }
+		}
 		rsDtlBillNos.close();
 	    }
 	    final String ORDERFORSUMMARY = "FLST";
@@ -1214,6 +1260,20 @@ public class clsJasperFormat9ForBill implements clsBillGenerationFormat
 		listOfServiceVatDetail.add(objBillDtl);
 	    }
 	    footerJasperParameters.put("listOfServiceVatDetail", listOfServiceVatDetail);
+
+	    if (listSummaryBillDtl.size() == 0)
+	    {
+		listOfServiceVatDetail.clear();
+
+		objBillDtl = new clsBillDtl();
+		objBillDtl.setStrItemName(clsGlobalVarClass.gBillFooter);
+
+		listOfServiceVatDetail.add(objBillDtl);
+
+		objBillDtl = new clsBillDtl();
+		objBillDtl.setStrItemName("");
+		listSummaryBillDtl.add(objBillDtl);
+	    }
 
 	    InputStream isForInnerReport = this.getClass().getClassLoader().getResourceAsStream("com/POSPrinting/Jasper/Bill/Formats/rptBillFormat9JasperFooter.jasper");
 	    JasperPrint jp1 = JasperFillManager.fillReport(isForInnerReport, footerJasperParameters, new JRBeanCollectionDataSource(listSummaryBillDtl));

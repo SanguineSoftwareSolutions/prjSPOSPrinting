@@ -4,6 +4,7 @@ import com.POSPrinting.Interfaces.clsBillGenerationFormat;
 import com.POSPrinting.Stationary.clsStockTransferNoteFormatForBill;
 import com.POSGlobal.controller.clsGlobalVarClass;
 import com.POSGlobal.controller.clsUtility2;
+import com.POSPrinting.Jasper.Bill.clsJasperFormat10ForBill;
 import com.POSPrinting.Jasper.Bill.clsJasperFormat1ForBill;
 import com.POSPrinting.Jasper.Bill.clsJasperFormat2ForBill;
 import com.POSPrinting.Jasper.Bill.clsJasperFormat3ForBill;
@@ -185,6 +186,10 @@ public class clsBillGeneration
 
 	    case "Jasper 9":
 		objBillGenerationFormat = new clsJasperFormat9ForBill();
+		break;
+
+	    case "Jasper 10":
+		objBillGenerationFormat = new clsJasperFormat10ForBill();
 		break;
 
 	    case "Stationery 1":
