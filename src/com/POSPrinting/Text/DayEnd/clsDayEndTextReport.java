@@ -106,7 +106,7 @@ public class clsDayEndTextReport
 	    double grandTotalSales = 0;
 	    if (posCode.equals("All"))
 	    {
-		sqlDayEnd = "select  'All' as POSCode,'All' as POSName,date(a.dtePOSDate),time(a.dteDayEndDateTime),sum(a.dblTotalSale), "
+		sqlDayEnd = "select  'All' as POSCode,'All' as POSName,DATE_FORMAT(date(a.dtePOSDate),'%d-%m-%Y'),time(a.dteDayEndDateTime),sum(a.dblTotalSale), "
 			+ " sum(a.dblFloat),sum(a.dblCash),sum(a.dblAdvance),  sum(a.dblTransferIn),sum(a.dblTotalReceipt),sum(a.dblPayments), "
 			+ " sum(a.dblWithDrawal),sum(a.dblTransferOut),sum(a.dblTotalPay),  sum(a.dblCashInHand),sum(a.dblHDAmt), "
 			+ " sum(a.dblDiningAmt),sum(a.dblTakeAway),sum(a.dblNoOfBill),sum(a.dblNoOfVoidedBill), "
@@ -123,7 +123,7 @@ public class clsDayEndTextReport
 	    }
 	    else
 	    {
-		sqlDayEnd = "SELECT a.strPOSCode,b.strPosName, DATE(a.dtePOSDate), TIME(a.dteDayEndDateTime),sum(a.dblTotalSale),\n"
+		sqlDayEnd = "SELECT a.strPOSCode,b.strPosName,DATE_FORMAT(date(a.dtePOSDate),'%d-%m-%Y'), TIME(a.dteDayEndDateTime),sum(a.dblTotalSale),\n"
 			+ " sum(a.dblFloat),sum(a.dblCash),sum(a.dblAdvance),sum( a.dblTransferIn),sum(a.dblTotalReceipt),sum(a.dblPayments),\n"
 			+ " sum(a.dblWithDrawal),sum(a.dblTransferOut),sum(a.dblTotalPay),sum(a.dblCashInHand),sum(a.dblHDAmt),\n"
 			+ " sum(a.dblDiningAmt),sum(a.dblTakeAway),sum(a.dblNoOfBill),sum(a.dblNoOfVoidedBill),\n"
@@ -456,8 +456,16 @@ public class clsDayEndTextReport
 			    + "and date(b.dteBillDate)=date(c.dteBillDate) "
 			    + "and c.strSettlementCode = d.strSettelmentCode "
 			    + "and date(a.dteBillDate) = ? "
-			    + "and d.strSettelmentType='Complementary' "
-			    + "GROUP BY d.strSettelmentDesc";
+			    + "and d.strSettelmentType='Complementary' ";
+
+		    if (clsGlobalVarClass.gEnableShiftYN)
+		    {
+			if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+			{
+			    sqlComplementarySales += " and a.intShiftCode = '" + shiftNo + "' ";
+			}
+		    }
+		    sqlComplementarySales += " GROUP BY d.strSettelmentDesc ";
 
 		    psComplementarySales = clsGlobalVarClass.conPrepareStatement.prepareStatement(sqlComplementarySales);
 		    psComplementarySales.setString(1, billDate);
@@ -475,8 +483,15 @@ public class clsDayEndTextReport
 			    + "and c.strSettlementCode = d.strSettelmentCode "
 			    + "and a.strPOSCode=?  "
 			    + "and date(a.dteBillDate) = ? "
-			    + "and d.strSettelmentType='Complementary' "
-			    + "GROUP BY d.strSettelmentDesc";
+			    + "and d.strSettelmentType='Complementary' ";
+		    if (clsGlobalVarClass.gEnableShiftYN)
+		    {
+			if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+			{
+			    sqlComplementarySales += " and a.intShiftCode = '" + shiftNo + "' ";
+			}
+		    }
+		    sqlComplementarySales += " GROUP BY d.strSettelmentDesc ";
 		    psComplementarySales = clsGlobalVarClass.conPrepareStatement.prepareStatement(sqlComplementarySales);
 		    psComplementarySales.setString(1, posCode);
 		    psComplementarySales.setString(2, billDate);
@@ -608,8 +623,13 @@ public class clsDayEndTextReport
 		    + "AND c.strGroupCode=d.strGroupCode "
 		    + "AND d.strSubGroupCode=e.strSubGroupCode "
 		    + "AND a.strPOSCode = '" + posCode + "' "
-		    + "AND DATE(a.dteBillDate)='" + billDate + "'"
-		    + "GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+		    + "AND DATE(a.dteBillDate)='" + billDate + "' ");
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+	    sqlBuilder.append(" GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+
 	    ResultSet rsGroupData = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
 	    while (rsGroupData.next())
 	    {
@@ -650,8 +670,13 @@ public class clsDayEndTextReport
 		    + "AND e.strGroupCode=c.strGroupCode  "
 		    + "AND b.dblamount>0 "
 		    + "AND a.strPOSCode = '" + posCode + "' "
-		    + "AND DATE(a.dteBillDate) = '" + billDate + "' "
-		    + "GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+		    + "AND DATE(a.dteBillDate) = '" + billDate + "' ");
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+	    sqlBuilder.append("GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+
 	    rsGroupData = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
 	    while (rsGroupData.next())
 	    {
@@ -693,8 +718,13 @@ public class clsDayEndTextReport
 		    + "AND c.strGroupCode=d.strGroupCode "
 		    + "AND d.strSubGroupCode=e.strSubGroupCode "
 		    + "AND a.strPOSCode = '" + posCode + "' "
-		    + "AND DATE(a.dteBillDate)='" + billDate + "'"
-		    + "GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+		    + "AND DATE(a.dteBillDate)='" + billDate + "' ");
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+	    sqlBuilder.append("GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+
 	    rsGroupData = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
 	    while (rsGroupData.next())
 	    {
@@ -735,8 +765,12 @@ public class clsDayEndTextReport
 		    + "AND e.strGroupCode=c.strGroupCode  "
 		    + "AND b.dblamount>0 "
 		    + "AND a.strPOSCode = '" + posCode + "' "
-		    + "AND DATE(a.dteBillDate) = '" + billDate + "' "
-		    + "GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
+		    + "AND DATE(a.dteBillDate) = '" + billDate + "' ");
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sqlBuilder.append("and a.intShiftCode='" + shiftNo + "' ");
+	    }
+	    sqlBuilder.append("GROUP BY c.strGroupCode, c.strGroupName, a.strPoscode;");
 	    rsGroupData = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
 	    while (rsGroupData.next())
 	    {
@@ -827,8 +861,12 @@ public class clsDayEndTextReport
 		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate)  "
 		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode  "
 		    + "AND DATE(b.dteReceiptDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + " and a.strPOSCode='" + posCode + "'  "
-		    + "GROUP BY c.strCustomerCode,b.strSettlementName ";
+		    + " and a.strPOSCode='" + posCode + "'  ";
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sbSqlLive += " and a.intShiftCode='" + shiftNo + "' ";
+	    }
+	    sbSqlLive += " GROUP BY c.strCustomerCode,b.strSettlementName ";
 
 	    String sbSqlQFile = "SELECT b.strReceiptNo as receiptNo, DATE_FORMAT(DATE(b.dteReceiptDate),'%d-%b-%Y')dteReceiptDate,b.strSettlementName as settlement,  "
 		    + "SUM(b.dblReceiptAmt) as ReceivedAmt,c.strCustomerName,a.strCustomerCode "
@@ -836,8 +874,12 @@ public class clsDayEndTextReport
 		    + "WHERE a.strBillNo=b.strBillNo AND DATE(a.dteBillDate)= DATE(b.dteBillDate)  "
 		    + "AND a.strClientCode=b.strClientCode AND a.strCustomerCode=c.strCustomerCode  "
 		    + "AND DATE(b.dteReceiptDate) BETWEEN '" + billDate + "' AND '" + billDate + "' "
-		    + " and a.strPOSCode='" + posCode + "'  "
-		    + "GROUP BY c.strCustomerCode,b.strSettlementName ";
+		    + " and a.strPOSCode='" + posCode + "'  ";
+	    if (clsGlobalVarClass.gEnableShiftYN && (!String.valueOf(shiftNo).equalsIgnoreCase("All")))
+	    {
+		sbSqlLive += " and a.intShiftCode='" + shiftNo + "' ";
+	    }
+	    sbSqlQFile += " GROUP BY c.strCustomerCode,b.strSettlementName ";
 
 	    sbSqlFilters1 = sbSqlFilters1 + " ";
 
@@ -1301,8 +1343,8 @@ public class clsDayEndTextReport
 	    bufferedWriter.write(dashLinesFor42Chars);
 
 	    bufferedWriter.newLine();
-	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  Total Incentive Amount",22, "left"));	   
-	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(totalIncentiveAmt),17, "right"));
+	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  Total Incentive Amount", 22, "left"));
+	    bufferedWriter.write(objUtility.funPrintTextWithAlignment("  " + gDecimalFormat.format(totalIncentiveAmt), 17, "right"));
 
 	    bufferedWriter.newLine();
 	    bufferedWriter.write(dashLinesFor42Chars);

@@ -118,10 +118,10 @@ public class clsKOTGeneration
 			    + " where a.strKOTNo=? and a.strTableNo=? and (c.strPosCode=? or c.strPosCode='All') "
 			    + " and (c.strAreaCode IN (SELECT strAreaCode FROM tbltablemaster where strTableNo=? ) OR c.strAreaCode =?) "
 			    + " group by d.strCostCenterCode ";
-		    if(clsGlobalVarClass.gFireCommunication)
+		    if (clsGlobalVarClass.gFireCommunication)
 		    {
-			sql=sql+" having sum(a.dblPrintQty)>0 ";
-		    }		    		    
+			sql = sql + " having sum(a.dblPrintQty)>0 ";
+		    }
 		    pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sql);
 		    pst.setString(1, KOTNo);
 		    pst.setString(2, tableNo);
@@ -140,12 +140,20 @@ public class clsKOTGeneration
 			{
 			    if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("239.001"))//urbo
 			    {
-				objJasperFormat2FileGenerationForMakeKOT=new clsKOTJasperFormat2FileGenerationForMakeKOT();
+				objJasperFormat2FileGenerationForMakeKOT = new clsKOTJasperFormat2FileGenerationForMakeKOT();
 				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				if (clsGlobalVarClass.gMultipleKOTPrint)
+				{
+				    objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Rerint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				}
 			    }
 			    else
 			    {
 				objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				if (clsGlobalVarClass.gMultipleKOTPrint)
+				{
+				    objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				}
 			    }
 			}
 			else if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("171.001") && clsGlobalVarClass.gPrintType.equals("Text File"))//china grill-pimpri menu head wise items kot format
@@ -228,13 +236,13 @@ public class clsKOTGeneration
      * @param WaiterName
      * @param printYN
      */
-    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN,String KOTFrom)
+    public void funCkeckKotTextFile(String TableNo, String WaiterName, String printYN, String KOTFrom)
     {
 	clsCheckKOT objCheckKOT = new clsCheckKOT();
-	objCheckKOT.funCkeckKotTextFile(TableNo, WaiterName, printYN,KOTFrom);
+	objCheckKOT.funCkeckKotTextFile(TableNo, WaiterName, printYN, KOTFrom);
     }
-    
-     /**
+
+    /**
      *
      * @param TableNo
      * @param WaiterName
@@ -245,15 +253,14 @@ public class clsKOTGeneration
 	clsCheckKOT objCheckKOT = new clsCheckKOT();
 	objCheckKOT.funCkeckKotForJasper(TableNo, WaiterName, printYN);
     }
-    
+
     /**
      * Kitchen note
      */
-    
-    public void funPrintKOTMessage(String costCenterCode, String costCenterName,String kitchenNote)
+    public void funPrintKOTMessage(String costCenterCode, String costCenterName, String kitchenNote)
     {
-	clsKitchenNote objKitchenNote=new clsKitchenNote();
-	objKitchenNote.funPrintKOTMessage(costCenterCode, costCenterName,kitchenNote);
+	clsKitchenNote objKitchenNote = new clsKitchenNote();
+	objKitchenNote.funPrintKOTMessage(costCenterCode, costCenterName, kitchenNote);
     }
 
 }

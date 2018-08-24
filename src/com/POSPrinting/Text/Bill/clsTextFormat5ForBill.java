@@ -1206,6 +1206,8 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 
 	    StringBuilder sbZeroAmtItems = new StringBuilder();
 
+	    double totalQty=0.00;
+	    
 	    BillOut.write(Linefor5);
 	    BillOut.newLine();
 	    BillOut.write("     QTY ITEM NAME                  AMT");
@@ -1290,6 +1292,8 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 
 		    if (Double.parseDouble(qty) > 0)
 		    {
+			totalQty+=Double.parseDouble(qty);
+			
 			objPrintingUtility.funPrintContentWithSpace("Right", qty, 8, BillOut);//Qty Print
 			BillOut.write(" ");
 			objPrintingUtility.funPrintContentWithSpace("Left", rs_BillDtl.getString(2), 22, BillOut);//Item Name
@@ -1444,14 +1448,23 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		rsCRMPoints.close();
 		BillOut.newLine();
 	    }
+	    
+	    String subTotalLabel="SUB TOTAL";
+	    if(clsGlobalVarClass.gClientCode.equals("185.001"))
+	    {
+		String strTotalQty=gDecimalFormat.format(totalQty);
+		strTotalQty=String.format("%7s", strTotalQty);
+		subTotalLabel=strTotalQty;
+	    }
+	    
 	    if (flgComplimentaryBill)
 	    {
-		objPrintingUtility.funWriteTotal("SUB TOTAL", gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
+		objPrintingUtility.funWriteTotal(subTotalLabel, gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
 		BillOut.newLine();
 	    }
 	    else
 	    {
-		objPrintingUtility.funWriteTotal("SUB TOTAL", gDecimalFormat.format(Double.parseDouble(subTotal)), BillOut, "Format5");
+		objPrintingUtility.funWriteTotal(subTotalLabel, gDecimalFormat.format(Double.parseDouble(subTotal)), BillOut, "Format5");
 		BillOut.newLine();
 	    }
 	    String sql = "select a.dblDiscPer,a.dblDiscAmt,a.strDiscOnType,a.strDiscOnValue,b.strReasonName,a.strDiscRemarks "

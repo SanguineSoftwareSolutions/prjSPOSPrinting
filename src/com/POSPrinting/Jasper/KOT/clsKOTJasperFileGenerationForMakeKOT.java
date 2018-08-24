@@ -273,41 +273,52 @@ public class clsKOTJasperFileGenerationForMakeKOT
 
 		if (printOnBothPrinters.equalsIgnoreCase("Y"))
 		{
-		    if (clsGlobalVarClass.gMultipleKOTPrint)
-		    {
-			objUtility2.funPrintJasperKOT(primary, print);
-			objUtility2.funPrintJasperKOT(primary, print);
+//		    if (clsGlobalVarClass.gMultipleKOTPrint)
+//		    {
+//			objUtility2.funPrintJasperKOT(primary, print);
+//			objUtility2.funPrintJasperKOT(primary, print);
+//
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//		    }
+//		    else
+//		    {
+//			objUtility2.funPrintJasperKOT(primary, print);
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//		    }
 
-			objUtility2.funPrintJasperKOT(secondary, print);
-			objUtility2.funPrintJasperKOT(secondary, print);
-		    }
-		    else
+		     if (!objUtility2.funPrintJasperKOT(primary, print))
 		    {
-			objUtility2.funPrintJasperKOT(primary, print);
 			objUtility2.funPrintJasperKOT(secondary, print);
 		    }
+
 		}
 		else
 		{
 
-		    if (clsGlobalVarClass.gMultipleKOTPrint)
+//		    if (clsGlobalVarClass.gMultipleKOTPrint)
+//		    {
+//			if (!objUtility2.funPrintJasperKOT(primary, print))
+//			{
+//			    objUtility2.funPrintJasperKOT(secondary, print);
+//			}
+//			if (!objUtility2.funPrintJasperKOT(primary, print))
+//			{
+//			    objUtility2.funPrintJasperKOT(secondary, print);
+//			}
+//		    }
+//		    else
+//		    {
+//			if (!objUtility2.funPrintJasperKOT(primary, print))
+//			{
+//			    objUtility2.funPrintJasperKOT(secondary, print);
+//			}
+//		    }
+		    if (!objUtility2.funPrintJasperKOT(primary, print))
 		    {
-			if (!objUtility2.funPrintJasperKOT(primary, print))
-			{
-			    objUtility2.funPrintJasperKOT(secondary, print);
-			}
-			if (!objUtility2.funPrintJasperKOT(primary, print))
-			{
-			    objUtility2.funPrintJasperKOT(secondary, print);
-			}
+			objUtility2.funPrintJasperKOT(secondary, print);
 		    }
-		    else
-		    {
-			if (!objUtility2.funPrintJasperKOT(primary, print))
-			{
-			    objUtility2.funPrintJasperKOT(secondary, print);
-			}
-		    }
+		    
 		}
 	    }
 	}

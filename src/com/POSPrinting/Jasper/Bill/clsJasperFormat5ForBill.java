@@ -241,7 +241,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    }
 		    else if (billSeries.equalsIgnoreCase("H"))
 		    {
-			objBillDtl.setStrItemName("Sheesha Total".toUpperCase());//"Hukkah Total"
+			objBillDtl.setStrItemName("Special Total".toUpperCase());//"Sheesha Total"//"Hukkah Total"
 			objBillDtl.setDblAmount(billTotal);
 		    }
 		    else
@@ -809,6 +809,7 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 		    advAmount = rs_BillHD.getString(14);
 		}
 
+		double totalQty=0;
 		List<clsBillDtl> listOfBillDetail = new ArrayList<>();
 		String SQL_BillDtl = "select sum(a.dblQuantity),a.strItemName as ItemLine1"
 			+ " ,MID(a.strItemName,23,LENGTH(a.strItemName)) as ItemLine2"
@@ -855,6 +856,8 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 			objBillDtl.setStrItemName(rs_BillDtl.getString(2));
 			listOfBillDetail.add(objBillDtl);
 
+			totalQty+=Double.parseDouble(decimalFormat.format(Double.parseDouble(qty)));
+			
 			String sqlModifier = "select count(*) "
 				+ "from " + billModifierdtl + " where strBillNo=? and left(strItemCode,7)=? and date(dteBillDate)=?";
 			if (!clsGlobalVarClass.gPrintZeroAmtModifierOnBill)
@@ -903,12 +906,23 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 				    objBillDtl.setStrItemName(rs_modifierRecord.getString(1).toUpperCase());
 				    listOfBillDetail.add(objBillDtl);
 				}
+				
+				totalQty+=Double.parseDouble(decimalFormat.format(rs_modifierRecord.getDouble(2)));
 			    }
 			    rs_modifierRecord.close();
 			}
 		    }
 		}
 		rs_BillDtl.close();
+		
+		if(clsGlobalVarClass.gPrintQtyTotal)
+		{
+		    hm.put("totalQty",totalQty);
+		}
+		else
+		{
+		    hm.put("totalQty",0.00);
+		}
 
 		objPrintingUtility.funPrintPromoItemsInBill(billNo, 4, listOfBillDetail);  // Print Promotion Items in Bill for this billno.
 
@@ -930,7 +944,16 @@ public class clsJasperFormat5ForBill implements clsBillGenerationFormat
 			flag = false;
 		    }
 		    double dbl = Double.parseDouble(rsDisc.getString("dblDiscPer"));
-		    String discText = String.format("%.1f", dbl) + "%" + " On " + rsDisc.getString("strDiscOnValue") + "";
+		    String discOn=rsDisc.getString("strDiscOnValue");
+		    if(discOn.equalsIgnoreCase("HOOKA"))
+		    {
+			discOn=" Special Discount";
+		    }
+		    else
+		    {
+			discOn=" On "+discOn;
+		    }
+		    String discText = String.format("%.1f", dbl) + "%" +discOn+ "";
 		    if (discText.length() > 30)
 		    {
 			discText = discText.substring(0, 30);
