@@ -114,12 +114,28 @@ public class clsKOTJasperFileGenerationForDirectBiller
                 hm.put("DATE & TIME", dateTimeFormat.format(rs_DirectKOT_Date.getObject(1)));
             }
             rs_DirectKOT_Date.close();
+	    
+	    
+	    
+	    String areaCodeForTransaction=clsGlobalVarClass.gAreaCodeForTrans;
+	    if(operationType.equalsIgnoreCase("HomeDelivery"))
+	    {
+		areaCodeForTransaction=clsGlobalVarClass.gHomeDeliveryAreaForDirectBiller;
+	    }
+	    else if (operationType.equalsIgnoreCase("TakeAway"))
+	    {
+		areaCodeForTransaction=clsGlobalVarClass.gTakeAwayAreaForDirectBiller;
+	    }
+	    else
+	    {
+		areaCodeForTransaction=clsGlobalVarClass.gDineInAreaForDirectBiller;
+	    }
 
             String sql_DirectKOT_Items = "select a.strItemCode,a.strItemName,a.dblQuantity,d.strShortName "
                     + "from tblbilldtl a,tblmenuitempricingdtl b,tblprintersetup c,tblitemmaster d "
                     + "where  a.strBillNo=? and  b.strCostCenterCode=c.strCostCenterCode "
                     + "and a.strItemCode=d.strItemCode "
-                    + "and b.strCostCenterCode=? and (b.strAreaCode=? or b.strAreaCode='" + clsGlobalVarClass.gAreaCodeForTrans + "') "
+                    + "and b.strCostCenterCode=? and (b.strAreaCode=? or b.strAreaCode='" + areaCodeForTransaction + "') "
                     + "and a.strItemCode=b.strItemCode "
                     + "group by a.strItemCode "
                     + "ORDER BY a.strSequenceNo;;";

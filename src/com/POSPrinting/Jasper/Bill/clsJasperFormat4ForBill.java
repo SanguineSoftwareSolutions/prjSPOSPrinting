@@ -468,6 +468,7 @@ public class clsJasperFormat4ForBill implements clsBillGenerationFormat
 		SQL_BillHD = "select a.dteBillDate,time(a.dteBillDate),a.dblDiscountAmt,a.dblSubTotal,"
 			+ "a.strCustomerCode,a.dblGrandTotal,a.dblTaxAmt,a.strReasonCode,a.strRemarks,a.strUserCreated"
 			+ ",ifnull(dblDeliveryCharges,0.00),ifnull(b.dblAdvDeposite,0.00),a.dblDiscountPer,c.strPOSName,a.intOrderNo "
+			+ ",a.strKOTToBillNote "
 			+ "from " + billhd + " a left outer join tbladvancereceipthd b on a.strAdvBookingNo=b.strAdvBookingNo "
 			+ "left outer join tblposmaster c on a.strPOSCode=c.strPOSCode "
 			+ "where a.strBillNo=?  "
@@ -484,6 +485,7 @@ public class clsJasperFormat4ForBill implements clsBillGenerationFormat
 		SQL_BillHD = "select a.strTableNo,a.strWaiterNo,a.dteBillDate,time(a.dteBillDate),a.dblDiscountAmt,a.dblSubTotal,"
 			+ "a.strCustomerCode,a.dblGrandTotal,a.dblTaxAmt,a.strReasonCode,a.strRemarks,a.strUserCreated"
 			+ ",dblDeliveryCharges,ifnull(c.dblAdvDeposite,0.00),a.dblDiscountPer,d.strPOSName,a.intPaxNo,a.intOrderNo "
+			+ ",a.strKOTToBillNote "
 			+ "from " + billhd + " a left outer join tbltablemaster b on a.strTableNo=b.strTableNo "
 			+ "left outer join tbladvancereceipthd c on a.strAdvBookingNo=c.strAdvBookingNo "
 			+ "left outer join tblposmaster d on a.strPOSCode=d.strPOSCode "
@@ -538,6 +540,9 @@ public class clsJasperFormat4ForBill implements clsBillGenerationFormat
 		{
 		    hm.put("orderNo", "Your order no is " + orderNo);
 		}
+		
+		String billNote = rs_BillHD.getString(16);
+		hm.put("strBillNote", billNote);
 
 		if (clsGlobalVarClass.gPrintTimeOnBillYN)
 		{
@@ -573,6 +578,9 @@ public class clsJasperFormat4ForBill implements clsBillGenerationFormat
 		{
 		    hm.put("orderNo", "Your Order No. Is:" + orderNo);
 		}
+		
+		String billNote = rs_BillHD.getString(19);
+		hm.put("strBillNote", billNote);
 
 		if (clsGlobalVarClass.gPrintTimeOnBillYN)
 		{
