@@ -38,7 +38,7 @@ import com.POSPrinting.Text.Bill.clsTextFormat8ForBill;
 import com.POSPrinting.Text.Bill.clsTextFormat9ForBill;
 import com.POSPrinting.Text.Bill.clsTextFormatForPlayZone;
 import com.POSPrinting.Text.Bill.clsTextFormatSaloonForBill;
-
+import com.POSPrinting.Text.Bill.clsTextFormat21ForBill;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates and open the template
@@ -147,6 +147,9 @@ public class clsBillGeneration
 		break;
 	    case "Text 20":
 		objBillGenerationFormat = new clsTextFormat20ForBill();//for HSN No on bill
+		break;
+	    case "Text 21":
+		objBillGenerationFormat = new clsTextFormat21ForBill();//for Bill series  
 		break;
 	    case "Text PlayZone":
 		objBillGenerationFormat = new clsTextFormatForPlayZone();//for PlayZone and HSN No on bill
