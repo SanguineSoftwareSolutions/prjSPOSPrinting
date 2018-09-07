@@ -1625,126 +1625,129 @@ public class clsTextFormat21ForBill implements clsBillGenerationFormat
 		    BillOut.newLine();
 		}
 		
-		/**
-		 * print Tax Nos
-		 */
-		objPrintingUtility.funPrintServiceVatNo(BillOut, 4, billNo, billDate, billtaxdtl);
-		BillOut.newLine();
-	    }
-	     objPrintingUtility.funWriteTotal("GRAND TOTAL(ROUNDED)", gDecimalFormat.format(dblAllBillsGT), BillOut, "Format5");
-	
-	    //settlement breakup part
-	    String sqlSettlementBreakup = "select a.dblSettlementAmt, b.strSettelmentDesc, b.strSettelmentType "
-		    + " from " + billSettlementdtl + " a ,tblsettelmenthd b," + billhd + " c "
-		    + " where a.strBillNo=? "
-		    + " and a.strBillNo=c.strBillNo "
-		    + " and a.strClientCode=c.strClientCode "
-		    + " and a.strSettlementCode=b.strSettelmentCode "
-		    + " AND date(a.dteBillDate)=date(c.dteBillDate) "
-		    + " and c.strposCode=? "
-		    + " and date(c.dteBillDate)=? ";
-	    pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sqlSettlementBreakup);
-	    pst.setString(1, billNo);
-	    pst.setString(2, posCode);
-	    pst.setString(3, billDate);
-	    boolean flgSettlement = false;
-	    boolean creditSettlement = false;
-	    ResultSet rsBillSettlement = pst.executeQuery();
-	    while (rsBillSettlement.next())
-	    {
-		if (flgComplimentaryBill)
+		 //settlement breakup part
+		String sqlSettlementBreakup = "select a.dblSettlementAmt, b.strSettelmentDesc, b.strSettelmentType "
+			+ " from " + billSettlementdtl + " a ,tblsettelmenthd b," + billhd + " c "
+			+ " where a.strBillNo=? "
+			+ " and a.strBillNo=c.strBillNo "
+			+ " and a.strClientCode=c.strClientCode "
+			+ " and a.strSettlementCode=b.strSettelmentCode "
+			+ " AND date(a.dteBillDate)=date(c.dteBillDate) "
+			+ " and c.strposCode=? "
+			+ " and date(c.dteBillDate)=? ";
+		pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sqlSettlementBreakup);
+		pst.setString(1, billNo);
+		pst.setString(2, posCode);
+		pst.setString(3, billDate);
+		boolean flgSettlement = false;
+		boolean creditSettlement = false;
+		ResultSet rsBillSettlement = pst.executeQuery();
+		while (rsBillSettlement.next())
 		{
-		    BillOut.newLine();
-		    objPrintingUtility.funWriteTotal(rsBillSettlement.getString(2), gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
-		}
-		else
-		{
-		    BillOut.newLine();
-		    objPrintingUtility.funWriteTotal(rsBillSettlement.getString(2), gDecimalFormat.format(rsBillSettlement.getDouble(1)), BillOut, "Format5");
-		}
-		flgSettlement = true;
-		if (rsBillSettlement.getString(3).equals("Credit"))
-		{
-		    creditSettlement = true;
-		}
-	    }
-	    rsBillSettlement.close();
-
-	    if (flgSettlement)
-	    {
-		BillOut.newLine();
-		if (creditSettlement)
-		{
-//                    objPrintingUtility.funWriteTotal("Credit Remarks ", rs_BillHD.getString(11), BillOut, "Format5");
-//                    BillOut.newLine();
-
-		    String textRemarks = rs_BillHD.getString(11).trim();
-		    String lblRemarks = "  Credit Remarks :";
-
-		    String remarks = lblRemarks + textRemarks;
-		    if (remarks.length() > 40)
+		    if (flgComplimentaryBill)
 		    {
-			BillOut.write(remarks.substring(0, 40));
-			BillOut.newLine();
-			remarks = remarks.substring(40, remarks.length());
+			
+			objPrintingUtility.funWriteTotal(rsBillSettlement.getString(2), gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
+		    }
+		    else
+		    {
+			
+			objPrintingUtility.funWriteTotal(rsBillSettlement.getString(2), gDecimalFormat.format(rsBillSettlement.getDouble(1)), BillOut, "Format5");
+		    }
+		    flgSettlement = true;
+		    if (rsBillSettlement.getString(3).equals("Credit"))
+		    {
+			creditSettlement = true;
+		    }
+		}
+		rsBillSettlement.close();
 
-			BillOut.write("                  " + remarks);
+		if (flgSettlement)
+		{
+		    BillOut.newLine();
+		    if (creditSettlement)
+		    {
+    //                    objPrintingUtility.funWriteTotal("Credit Remarks ", rs_BillHD.getString(11), BillOut, "Format5");
+    //                    BillOut.newLine();
+
+			String textRemarks = rs_BillHD.getString(11).trim();
+			String lblRemarks = "  Credit Remarks :";
+
+			String remarks = lblRemarks + textRemarks;
+			if (remarks.length() > 40)
+			{
+			    BillOut.write(remarks.substring(0, 40));
+			    BillOut.newLine();
+			    remarks = remarks.substring(40, remarks.length());
+
+			    BillOut.write("                  " + remarks);
+			    BillOut.newLine();
+			}
+			else
+			{
+			    BillOut.write(remarks);
+			    BillOut.newLine();
+			}
+
+			String custName = rs_BillHD.getString(24);
+			if (!custName.isEmpty())
+			{
+			    objPrintingUtility.funWriteTotal("Customer " + custName, "", BillOut, "Format5");
+			}
+			BillOut.newLine();
+			BillOut.write(Linefor5);
+		    }
+		}
+
+		String sqlTenderAmt = "select sum(a.dblPaidAmt),sum(a.dblSettlementAmt),(sum(a.dblPaidAmt)-sum(a.dblSettlementAmt)) RefundAmt "
+			+ " from " + billSettlementdtl + " a," + billhd + " b "
+			+ " where a.strBillNo=b.strBillNo "
+			+ " and a.strClientCode=b.strClientCode "
+			+ " AND date(a.dteBillDate)=date(b.dteBillDate) "
+			+ " and b.strBillNo='" + billNo + "' "
+			+ " and b.strposCode='" + posCode + "' "
+			+ " and date(b.dteBillDate)='" + billDate + "' "
+			+ " group by a.strBillNo";
+		ResultSet rsTenderAmt = clsGlobalVarClass.dbMysql.executeResultSet(sqlTenderAmt);
+		if (rsTenderAmt.next() && !creditSettlement)
+		{
+		    BillOut.newLine();
+		    if (flgComplimentaryBill)
+		    {
+			objPrintingUtility.funWriteTotal("PAID AMT", gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
 			BillOut.newLine();
 		    }
 		    else
 		    {
-			BillOut.write(remarks);
+			objPrintingUtility.funWriteTotal("PAID AMT", gDecimalFormat.format(rsTenderAmt.getDouble(1)), BillOut, "Format5");
 			BillOut.newLine();
+			if (rsTenderAmt.getDouble(3) > 0)
+			{
+			    objPrintingUtility.funWriteTotal("REFUND AMT", gDecimalFormat.format(rsTenderAmt.getDouble(3)), BillOut, "Format5");
+			    BillOut.newLine();
+			}
 		    }
-
-		    String custName = rs_BillHD.getString(24);
-		    if (!custName.isEmpty())
-		    {
-			objPrintingUtility.funWriteTotal("Customer " + custName, "", BillOut, "Format5");
-		    }
-		    BillOut.newLine();
 		    BillOut.write(Linefor5);
 		}
-	    }
-
-	    String sqlTenderAmt = "select sum(a.dblPaidAmt),sum(a.dblSettlementAmt),(sum(a.dblPaidAmt)-sum(a.dblSettlementAmt)) RefundAmt "
-		    + " from " + billSettlementdtl + " a," + billhd + " b "
-		    + " where a.strBillNo=b.strBillNo "
-		    + " and a.strClientCode=b.strClientCode "
-		    + " AND date(a.dteBillDate)=date(b.dteBillDate) "
-		    + " and b.strBillNo='" + billNo + "' "
-		    + " and b.strposCode='" + posCode + "' "
-		    + " and date(b.dteBillDate)='" + billDate + "' "
-		    + " group by a.strBillNo";
-	    ResultSet rsTenderAmt = clsGlobalVarClass.dbMysql.executeResultSet(sqlTenderAmt);
-	    if (rsTenderAmt.next() && !creditSettlement)
-	    {
+		rsTenderAmt.close();
+		
+		/**
+		 * print Tax Nos
+		 */
 		BillOut.newLine();
-		if (flgComplimentaryBill)
-		{
-		    objPrintingUtility.funWriteTotal("PAID AMT", gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
-		    BillOut.newLine();
-		}
-		else
-		{
-		    objPrintingUtility.funWriteTotal("PAID AMT", gDecimalFormat.format(rsTenderAmt.getDouble(1)), BillOut, "Format5");
-		    BillOut.newLine();
-		    if (rsTenderAmt.getDouble(3) > 0)
-		    {
-			objPrintingUtility.funWriteTotal("REFUND AMT", gDecimalFormat.format(rsTenderAmt.getDouble(3)), BillOut, "Format5");
-			BillOut.newLine();
-		    }
-		}
-		BillOut.write(Linefor5);
+		objPrintingUtility.funPrintServiceVatNo(BillOut, 4, billNo, billDate, billtaxdtl);
+		BillOut.newLine();
 	    }
-	    rsTenderAmt.close();
-
+	    
 	    if (rs_BillHD.getDouble(29) > 0)
 	    {
 		BillOut.newLine();
 		objPrintingUtility.funWriteTotal("TIP AMT", rs_BillHD.getString(29), BillOut, "Format5");
 		BillOut.newLine();
 	    }
+	    
+	     objPrintingUtility.funWriteTotal("GRAND TOTAL(ROUNDED)", gDecimalFormat.format(dblAllBillsGT), BillOut, "Format5");
+	    BillOut.newLine();
 	    if (flag_isHomeDelvBill)
 	    {
 		BillOut.newLine();
