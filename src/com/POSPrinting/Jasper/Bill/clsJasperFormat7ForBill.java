@@ -473,7 +473,7 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		SQL_BillHD = "select a.dteBillDate,time(a.dteBillDate),a.dblDiscountAmt,a.dblSubTotal,"
 			+ "a.strCustomerCode,a.dblGrandTotal,a.dblTaxAmt,a.strReasonCode,a.strRemarks,a.strUserCreated"
 			+ ",ifnull(dblDeliveryCharges,0.00),ifnull(b.dblAdvDeposite,0.00),a.dblDiscountPer,c.strPOSName,a.intOrderNo "
-			+ ",a.strKOTToBillNote "
+			+ ",a.strKOTToBillNote,a.dblTipAmount "//17
 			+ "from " + billhd + " a left outer join tbladvancereceipthd b on a.strAdvBookingNo=b.strAdvBookingNo "
 			+ "left outer join tblposmaster c on a.strPOSCode=c.strPOSCode "
 			+ "where a.strBillNo=?  "
@@ -490,7 +490,7 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		SQL_BillHD = "select a.strTableNo,a.strWaiterNo,a.dteBillDate,time(a.dteBillDate),a.dblDiscountAmt,a.dblSubTotal,"
 			+ "a.strCustomerCode,a.dblGrandTotal,a.dblTaxAmt,a.strReasonCode,a.strRemarks,a.strUserCreated"
 			+ ",dblDeliveryCharges,ifnull(c.dblAdvDeposite,0.00),a.dblDiscountPer,d.strPOSName,a.intPaxNo,a.intOrderNo "
-			+ ",a.strKOTToBillNote "
+			+ ",a.strKOTToBillNote,a.dblTipAmount "//20
 			+ "from " + billhd + " a left outer join tbltablemaster b on a.strTableNo=b.strTableNo "
 			+ "left outer join tbladvancereceipthd c on a.strAdvBookingNo=c.strAdvBookingNo "
 			+ "left outer join tblposmaster d on a.strPOSCode=d.strPOSCode "
@@ -545,10 +545,9 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		{
 		    hm.put("orderNo", "Your order no is " + orderNo);
 		}
-		
+
 		String billNote = rs_BillHD.getString(16);
 		hm.put("strBillNote", billNote);
-		
 
 		if (clsGlobalVarClass.gPrintTimeOnBillYN)
 		{
@@ -566,6 +565,8 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		user = rs_BillHD.getString(10);
 		deliveryCharge = rs_BillHD.getString(11);
 		advAmount = rs_BillHD.getString(12);
+
+		hm.put("tipAmt", rs_BillHD.getString(17));
 	    }
 	    else
 	    {
@@ -584,7 +585,7 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		{
 		    hm.put("orderNo", "Your Order No. Is:" + orderNo);
 		}
-		
+
 		String billNote = rs_BillHD.getString(19);
 		hm.put("strBillNote", billNote);
 
@@ -604,6 +605,8 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		user = rs_BillHD.getString(12);
 		deliveryCharge = rs_BillHD.getString(13);
 		advAmount = rs_BillHD.getString(14);
+
+		hm.put("tipAmt", rs_BillHD.getString(20));
 	    }
 
 	    List<clsBillDtl> listOfBillDetail = new ArrayList<>();
@@ -912,6 +915,14 @@ public class clsJasperFormat7ForBill implements clsBillGenerationFormat
 		}
 	    }
 	    rsTenderAmt.close();
+
+	    if (hm.get("tipAmt") != null && Double.parseDouble(hm.get("tipAmt").toString()) > 0)
+	    {
+		objBillDtl = new clsBillDtl();
+		objBillDtl.setStrItemName("TIP AMT");
+		objBillDtl.setDblAmount(Double.parseDouble(hm.get("tipAmt").toString()));
+		listOfSettlementDetail.add(objBillDtl);
+	    }
 
 	    if (flag_isHomeDelvBill)
 	    {

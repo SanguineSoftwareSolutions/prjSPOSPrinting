@@ -6,7 +6,6 @@
 package com.POSPrinting.Text.Bill;
 
 import com.POSPrinting.Utility.clsPrintingUtility;
-import com.POSGlobal.controller.clsBillDtl;
 import com.POSGlobal.controller.clsGlobalVarClass;
 import com.POSGlobal.controller.clsPosConfigFile;
 import com.POSGlobal.controller.clsUtility;
@@ -19,15 +18,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import javafx.scene.shape.Line;
 
 /**
  *
  * @author Ajim
  * @date Aug 26, 2017
  */
-public class clsTextFormat5ForBill implements clsBillGenerationFormat
+public class clsTextFormatForForeignCurrencyForBill implements clsBillGenerationFormat
 {
 
     // private DecimalFormat decimalFormat = new DecimalFormat("#.###");
@@ -1540,7 +1537,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    + " and a.strClientCode=c.strClientCode "
 		    + " and date(a.dteBillDate)=date(c.dteBillDate) "
 		    + " and c.strposCode='" + posCode + "' "
-		    + " and b.strTaxCalculation='Forward' "
+		    //+ " and b.strTaxCalculation='Forward' "
 		    + " and date(c.dteBillDate)='" + billDate + "' "
 		    + " group by a.strTaxCode";
 	    ResultSet rsTax = clsGlobalVarClass.dbMysql.executeResultSet(sql_Tax);
