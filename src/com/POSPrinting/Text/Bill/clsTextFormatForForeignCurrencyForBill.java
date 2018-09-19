@@ -1529,7 +1529,7 @@ public class clsTextFormatForForeignCurrencyForBill implements clsBillGeneration
 		BillOut.newLine();
 
 	    }
-	    String sql_Tax = "select b.strTaxDesc,sum(a.dblTaxAmount) "
+	    String sql_Tax = "select b.strTaxDesc,sum(a.dblTaxAmount),sum(a.dblTaxableAmount),b.strTaxCalculation "
 		    + " from " + billtaxdtl + " a,tbltaxhd b," + billhd + " c "
 		    + " where a.strBillNo='" + billNo + "' "
 		    + " and a.strTaxCode=b.strTaxCode "
@@ -1543,14 +1543,24 @@ public class clsTextFormatForForeignCurrencyForBill implements clsBillGeneration
 	    ResultSet rsTax = clsGlobalVarClass.dbMysql.executeResultSet(sql_Tax);
 	    while (rsTax.next())
 	    {
+		double taxbleAmt=0.00;
+		if(rsTax.getString(4).equalsIgnoreCase("Backward"))
+		{
+		    taxbleAmt=rsTax.getDouble(3)-rsTax.getDouble(2);
+		}
+		else
+		{
+		    taxbleAmt=rsTax.getDouble(3);
+		}
+		
 		if (flgComplimentaryBill)
 		{
-		    objPrintingUtility.funWriteTotal(rsTax.getString(1), gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
+		    objPrintingUtility.funWriteTotal(rsTax.getString(1)+"     "+gDecimalFormat.format(0.000), gDecimalFormat.format(Double.parseDouble("0.00")), BillOut, "Format5");
 		    BillOut.newLine();
 		}
 		else
 		{
-		    objPrintingUtility.funWriteTotal(rsTax.getString(1), gDecimalFormat.format(rsTax.getDouble(2)), BillOut, "Format5");
+		    objPrintingUtility.funWriteTotal(rsTax.getString(1)+"     "+gDecimalFormat.format(taxbleAmt), gDecimalFormat.format(rsTax.getDouble(2)), BillOut, "Format5");
 		    BillOut.newLine();
 		}
 	    }
