@@ -259,8 +259,16 @@ public class clsKOTGeneration
      */
     public void funPrintKOTMessage(String costCenterCode, String costCenterName, String kitchenNote)
     {
-	clsKitchenNote objKitchenNote = new clsKitchenNote();
-	objKitchenNote.funPrintKOTMessage(costCenterCode, costCenterName, kitchenNote);
+	if (clsGlobalVarClass.gPrintType.equals("Jasper"))
+	{
+	    clsKitchenNote objKitchenNote = new clsKitchenNote();
+	    objKitchenNote.funPrintKOTJasperMessage(costCenterCode, costCenterName, kitchenNote);
+	}
+	else
+	{
+	    clsKitchenNote objKitchenNote = new clsKitchenNote();
+	    objKitchenNote.funPrintKOTTextMessage(costCenterCode, costCenterName, kitchenNote);
+	}
     }
 
 }

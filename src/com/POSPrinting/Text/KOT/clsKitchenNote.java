@@ -9,15 +9,19 @@ import com.POSGlobal.controller.clsGlobalVarClass;
 import com.POSGlobal.controller.clsUtility;
 import com.POSGlobal.controller.clsUtility2;
 import com.POSPrinting.Utility.clsPrintingUtility;
+import java.awt.Dimension;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -30,7 +34,13 @@ import javax.print.attribute.HashDocAttributeSet;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
 
 /**
  *
@@ -48,7 +58,7 @@ public class clsKitchenNote
 	objUtility2 = new clsUtility2();
     }
 
-    public void funPrintKOTMessage(String costCenterCode, String costCenterName,String kitchenNote)
+    public void funPrintKOTTextMessage(String costCenterCode, String costCenterName, String kitchenNote)
     {
 	try
 	{
@@ -65,9 +75,8 @@ public class clsKitchenNote
 		try
 		{
 		    File file = new File(filename);
-		    
-		    
-		    funCreateTestTextFile(file, costCenterCode, costCenterName, printerName, secondaryPrinterName,kitchenNote);
+
+		    funCreateTestTextFile(file, costCenterCode, costCenterName, printerName, secondaryPrinterName, kitchenNote);
 
 		    clsPrintingUtility objPrintingUtility = new clsPrintingUtility();
 		    objPrintingUtility.funShowTextFile(file, "", "");
@@ -147,7 +156,7 @@ public class clsKitchenNote
 	}
     }
 
-    private void funCreateTestTextFile(File file, String costcenterCode, String costcenterName, String primaryPrinter, String secondaryPrinter,String kitchenNote)
+    private void funCreateTestTextFile(File file, String costcenterCode, String costcenterName, String primaryPrinter, String secondaryPrinter, String kitchenNote)
     {
 	BufferedWriter fileWriter = null;
 	try
@@ -205,5 +214,64 @@ public class clsKitchenNote
 	    }
 	}
 
+    }
+
+    public void funPrintKOTJasperMessage(String costCenterCode, String costCenterName, String kitchenNote)
+    {
+	try
+	{
+	    
+
+	    String sqlCostCenters = "select a.strPrinterPort,a.strSecondaryPrinterPort,a.strPrintOnBothPrinters from tblcostcentermaster a where a.strCostCenterCode='" + costCenterCode + "' ";
+	    ResultSet rsCostCenters = clsGlobalVarClass.dbMysql.executeResultSet(sqlCostCenters);
+	    if (rsCostCenters.next())
+	    {
+		String printerName = rsCostCenters.getString(1);
+		String secondaryPrinterName = rsCostCenters.getString(1);
+		String reportName = "com/POSGlobal/reports/rptKitchenNote.jasper";
+		try
+		{
+		    clsUtility2 objUtility2 = new clsUtility2();
+
+		    HashMap hm = new HashMap();
+		    hm.put("note", kitchenNote);
+		    hm.put("DATE_TIME", clsGlobalVarClass.getCurrentDateTime());
+
+		    ArrayList listData = new ArrayList();
+		    listData.add(1);
+
+		    JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(listData);
+		    InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportName);
+
+		    JasperPrint print = JasperFillManager.fillReport(is, hm, beanColDataSource);
+		    JRViewer viewer = new JRViewer(print);
+		    JFrame jf = new JFrame();
+		    jf.getContentPane().add(viewer);
+		    jf.validate();
+		    if (clsGlobalVarClass.gShowBill)
+		    {
+			jf.setVisible(true);
+			jf.setSize(new Dimension(500, 900));
+			jf.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		    }
+
+		    //--- Print the document
+		    objUtility2.funPrintJasperKOT(printerName, print);
+
+		}
+		catch (Exception e)
+		{
+
+		    objUtility.funWriteErrorLog(e);
+		    e.printStackTrace();
+		    JOptionPane.showMessageDialog(null, e.getMessage(), "Error Code - TFG 01", JOptionPane.ERROR_MESSAGE);
+		}
+	    }
+	}
+	catch (Exception e)
+	{
+	    objUtility.funWriteErrorLog(e);
+	    e.printStackTrace();
+	}
     }
 }

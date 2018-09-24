@@ -1736,7 +1736,7 @@ public class clsTextFormat21ForBill implements clsBillGenerationFormat
 		 */
 		BillOut.newLine();
 		objPrintingUtility.funPrintServiceVatNo(BillOut, 4, billNo, billDate, billtaxdtl);
-		BillOut.newLine();
+		
 	    }
 	    
 	    if (rs_BillHD.getDouble(29) > 0)
@@ -1746,8 +1746,13 @@ public class clsTextFormat21ForBill implements clsBillGenerationFormat
 		BillOut.newLine();
 	    }
 	    
-	     objPrintingUtility.funWriteTotal("GRAND TOTAL(ROUNDED)", gDecimalFormat.format(dblAllBillsGT), BillOut, "Format5");
+	    BillOut.write(Linefor5);
 	    BillOut.newLine();
+	    objPrintingUtility.funWriteTotal("GRAND TOTAL(ROUNDED)", gDecimalFormat.format(dblAllBillsGT), BillOut, "Format5");
+	    BillOut.newLine();
+	    BillOut.write(Linefor5);
+	    BillOut.newLine();
+	    
 	    if (flag_isHomeDelvBill)
 	    {
 		BillOut.newLine();

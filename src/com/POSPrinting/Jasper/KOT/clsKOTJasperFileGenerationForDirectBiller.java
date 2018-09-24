@@ -131,13 +131,13 @@ public class clsKOTJasperFileGenerationForDirectBiller
 		areaCodeForTransaction=clsGlobalVarClass.gDineInAreaForDirectBiller;
 	    }
 
-            String sql_DirectKOT_Items = "select a.strItemCode,a.strItemName,a.dblQuantity,d.strShortName "
+            String sql_DirectKOT_Items = "select a.strItemCode,a.strItemName,sum(a.dblQuantity),d.strShortName,a.strSequenceNo "
                     + "from tblbilldtl a,tblmenuitempricingdtl b,tblprintersetup c,tblitemmaster d "
                     + "where  a.strBillNo=? and  b.strCostCenterCode=c.strCostCenterCode "
                     + "and a.strItemCode=d.strItemCode "
                     + "and b.strCostCenterCode=? and (b.strAreaCode=? or b.strAreaCode='" + areaCodeForTransaction + "') "
                     + "and a.strItemCode=b.strItemCode "
-                    + "group by a.strItemCode "
+                    + "group by a.strItemCode,a.strSequenceNo "
                     + "ORDER BY a.strSequenceNo;;";
             pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sql_DirectKOT_Items);
             pst.setString(1, BillNo);
@@ -162,7 +162,9 @@ public class clsKOTJasperFileGenerationForDirectBiller
                         + "from tblbillmodifierdtl a "
                         + "left outer join tblitemmodofier b on left(a.strItemCode,7)=if(b.strItemCode='',a.strItemCode,b.strItemCode) "
                         + "and a.strModifierCode=if(a.strModifierCode=null,'',b.strModifierCode) "
-                        + "where a.strBillNo=? and left(a.strItemCode,7)=? ";
+                        + "where a.strBillNo=? "
+			+ "and left(a.strItemCode,7)=? "
+			+ " and left(a.strSequenceNo,1)='" + rs_DirectKOT_Items.getString(5) + "' ";
                 //System.out.println(sql_Modifier);
                 pst = clsGlobalVarClass.conPrepareStatement.prepareStatement(sql_Modifier);
                 pst.setString(1, BillNo);
