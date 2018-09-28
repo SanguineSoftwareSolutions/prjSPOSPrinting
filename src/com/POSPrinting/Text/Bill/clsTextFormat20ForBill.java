@@ -1144,7 +1144,7 @@ public class clsTextFormat20ForBill implements clsBillGenerationFormat
             }
             rs_BillDtl.close();
 
-            objPrintingUtility.funPrintComplimentaryItemsInBill(billNo, BillOut, 4, posCode, billDate, sbZeroAmtItems);
+            objPrintingUtility.funPrintComplimentaryItemsInBill(billNo, BillOut, 4, posCode, billDate, sbZeroAmtItems,billhd,billComplDtl);
 
             objPrintingUtility.funPrintPromoItemsInBill(billNo, BillOut, 4, billPromoDtl);  // Print Promotion Items in Bill for this billno.
 

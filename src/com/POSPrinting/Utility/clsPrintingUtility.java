@@ -1438,7 +1438,7 @@ public class clsPrintingUtility
      * @return
      * @throws Exception
      */
-    public int funPrintComplimentaryItemsInBill(String billNo, BufferedWriter objBillOut, int billPrintSize, String POSCode, String billDate, StringBuilder sbZeroAmtItems) throws Exception
+    public int funPrintComplimentaryItemsInBill(String billNo, BufferedWriter objBillOut, int billPrintSize, String POSCode, String billDate, StringBuilder sbZeroAmtItems,String billHD,String billCompli) throws Exception
     {
 	if (sbZeroAmtItems.length() > 0)
 	{
@@ -1446,7 +1446,7 @@ public class clsPrintingUtility
 	}
 	clsUtility objUtility = new clsUtility();
 	String sqlBillComplDtl = "select b.strItemName,b.dblQuantity "
-		+ " from tblbillhd a,tblbillcomplementrydtl b "
+		+ " from "+billHD+" a,"+billCompli+" b "
 		+ " where a.strBillNo=b.strBillNo and a.strClientCode=b.strClientCode "
 		+ " and date(a.dteBillDate)=date(b.dteBillDate) and a.strBillNo='" + billNo + "' "
 		+ " and a.strPOSCode='" + POSCode + "'  and date(a.dteBillDate)='" + billDate + "' "
