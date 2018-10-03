@@ -170,7 +170,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    + ",ifnull(dblDeliveryCharges,0.00),ifnull(i.dblAdvDeposite,0.00),a.dblDiscountPer,b.strPOSName,a.intPaxNo "
 		    + ",ifnull(c.strTableName,''),ifnull(d.strWShortName,''),ifnull(d.strWFullName,''),ifnull(l.strSettelmentType,''),ifnull(j.strReasonName,'') as voidedReason, "
 		    + "ifnull(g.strReasonName,''),ifnull(e.strCustomerName,''),ifnull(a.strAdvBookingNo,''),ifnull(h.strMessage,''),ifnull(h.strShape,''),ifnull(h.strNote,''),ifnull(a.dblTipAmount,0.00) "
-		    + ",a.strOperationType,ifnull(a.strTakeAwayRemarks,''),ifnull(e.longMobileNo,''),a.strKOTToBillNote  "
+		    + ",a.strOperationType,ifnull(a.strTakeAwayRemarks,''),ifnull(e.longMobileNo,''),a.strKOTToBillNote,e.strGSTNo  "
 		    + "from " + billhd + " a "
 		    + "left outer join tblposmaster b on a.strPOSCode=b.strPosCode  "
 		    + "left outer join tbltablemaster c on a.strTableNo=c.strTableNo and a.strClientCode=c.strClientCode "
@@ -249,7 +249,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		if (rs_HomeDelivery.getString(5).equals("Temporary"))
 		{
 		    SQL_CustomerDtl = "select a.strCustomerName,a.strTempAddress,a.strTempStreet"
-			    + " ,a.strTempLandmark,a.strBuildingName,a.strCity,a.intPinCode,a.longMobileNo "
+			    + " ,a.strTempLandmark,a.strBuildingName,a.strCity,a.intPinCode,a.longMobileNo,a.strGSTNo "
 			    + " from tblcustomermaster a left outer join tblbuildingmaster b "
 			    + " on a.strBuldingCode=b.strBuildingCode "
 			    + " where a.strCustomerCode=? ;";
@@ -257,14 +257,14 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		else if (rs_HomeDelivery.getString(5).equals("Office"))
 		{
 		    SQL_CustomerDtl = "select a.strCustomerName,a.strOfficeBuildingName,a.strOfficeStreetName"
-			    + ",a.strOfficeLandmark,a.strOfficeArea,a.strOfficeCity,a.strOfficePinCode,a.longMobileNo "
+			    + ",a.strOfficeLandmark,a.strOfficeArea,a.strOfficeCity,a.strOfficePinCode,a.longMobileNo,a.strGSTNo "
 			    + " from tblcustomermaster a "
 			    + " where a.strCustomerCode=? ";
 		}
 		else
 		{
 		    SQL_CustomerDtl = "select a.strCustomerName,a.strCustAddress,a.strStreetName"
-			    + " ,a.strLandmark,a.strBuildingName,a.strCity,a.intPinCode,a.longMobileNo "
+			    + " ,a.strLandmark,a.strBuildingName,a.strCity,a.intPinCode,a.longMobileNo,a.strGSTNo "
 			    + " from tblcustomermaster a left outer join tblbuildingmaster b "
 			    + " on a.strBuldingCode=b.strBuildingCode "
 			    + " where a.strCustomerCode=? ;";
@@ -361,6 +361,11 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    // Mobile No    
 		    BillOut.write("  MOBILE NO :" + rs_CustomerDtl.getString(8));
 		    BillOut.newLine();
+		    if(!rs_CustomerDtl.getString(9).equalsIgnoreCase(""))
+		    {	
+		    BillOut.write("  GST NO :" + rs_CustomerDtl.getString(9));
+		    BillOut.newLine();
+		    }
 		}
 		rs_CustomerDtl.close();
 		if (null != rs_HomeDelivery.getString(3) && rs_HomeDelivery.getString(3).trim().length() > 0)
@@ -410,7 +415,8 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    // Mobile No    
 		    BillOut.write("  MOBILE NO :" + rs_BillHD.getString(32));
 		    BillOut.newLine();
-
+		    BillOut.write("  GST NO :" + rs_BillHD.getString(34));
+		    BillOut.newLine();
 		    isCustomerPrint = true;
 		}
 	    }
@@ -1409,7 +1415,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    {
 			if (!viewORprint.equalsIgnoreCase("view"))
 			{
-			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
 			}
 		    }
 		}
@@ -1419,7 +1425,7 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    {
 			if (!viewORprint.equalsIgnoreCase("view"))
 			{
-			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
 			}
 		    }
 		    else

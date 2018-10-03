@@ -468,7 +468,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 		ResultSet rsCostCenter = clsGlobalVarClass.dbMysql.executeResultSet(sql);
 		if (rsCostCenter.next())
 		{
-		    objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint);
+		    objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint,costCenterCode);
 		}
 		rsCostCenter.close();
 	    }
@@ -947,7 +947,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 			String secondary = rsPrinter.getString(2);
 			String printOnBothPrinters = rsPrinter.getString(3);
 
-			objPrintingUtility.funPrintToPrinter(primary, secondary, "kot", printOnBothPrinters, isReprint);
+			objPrintingUtility.funPrintToPrinter(primary, secondary, "kot", printOnBothPrinters, isReprint,costCenterCode);
 		    }
 		    rsPrinter.close();
 		}
@@ -957,7 +957,7 @@ public class clsKOTTextFileGenerationForMakeKOT
 		    ResultSet rsCostCenter = clsGlobalVarClass.dbMysql.executeResultSet(sql);
 		    if (rsCostCenter.next())
 		    {
-			objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint);
+			objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint,costCenterCode);
 		    }
 		    rsCostCenter.close();
 		}

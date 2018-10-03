@@ -493,7 +493,7 @@ public class clsCheckKOT
 
 	    if (printYN.equalsIgnoreCase("Y"))
 	    {
-		objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "checkkot", "N", false);
+		objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "checkkot", "N", false,"");
 	    }
 	}
 	catch (Exception e)

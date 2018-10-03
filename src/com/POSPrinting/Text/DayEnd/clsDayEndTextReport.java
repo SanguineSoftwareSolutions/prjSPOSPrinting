@@ -1129,7 +1129,7 @@ public class clsDayEndTextReport
 	    }
 	    if (printYN.equalsIgnoreCase("Y"))
 	    {
-		objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "dayend", "N", isReprint);
+		objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "dayend", "N", isReprint,"");
 	    }
 
 	}

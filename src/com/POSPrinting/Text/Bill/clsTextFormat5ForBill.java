@@ -1881,7 +1881,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    {
 			if (!viewORprint.equalsIgnoreCase("view"))
 			{
-			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
 			}
 		    }
 		}
@@ -1891,7 +1891,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    {
 			if (!viewORprint.equalsIgnoreCase("view"))
 			{
-			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+			    objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
 			}
 		    }
 		    else

@@ -317,7 +317,7 @@ public class clsConsolidatedKOTTextFileGenerationForMakeKOT
 //            }
             if (clsGlobalVarClass.gConsolidatedKOTPrinterPort.length() > 0)
             {
-                objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gConsolidatedKOTPrinterPort, "", "ConsolidatedKOT", "N", false);
+                objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gConsolidatedKOTPrinterPort, "", "ConsolidatedKOT", "N", false,"");
             }
 
         }

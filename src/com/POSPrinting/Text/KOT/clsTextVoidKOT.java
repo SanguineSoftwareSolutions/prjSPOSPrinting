@@ -67,8 +67,16 @@ public class clsTextVoidKOT implements clsVoidKOTFormat
             KotOut.write("VOID KOT");
             KotOut.newLine();
 
-            objPrintingUtility.funPrintBlankSpace("KOT", KotOut);
-            KotOut.write("KOT");
+	    String strLabelOnKOT = "";
+	    StringBuilder sqlCostCenterLabelOnKOT = new StringBuilder("select a.strLabelOnKOT from tblcostcentermaster a " 
+		    + "where a.strCostCenterCode='"+costCenterCode+"'");
+	    ResultSet rsCostCenterLaelOnKOT = clsGlobalVarClass.dbMysql.executeResultSet(sqlCostCenterLabelOnKOT.toString());
+	    if(rsCostCenterLaelOnKOT.next())
+	    {
+		strLabelOnKOT = rsCostCenterLaelOnKOT.getString(1);
+	    }	
+	    objPrintingUtility.funPrintBlankSpace(strLabelOnKOT, KotOut);
+            KotOut.write(strLabelOnKOT);
 
             //item will pickup from tblvoidkot
             String sqlVOIDKOT_Items = "select a.dblItemQuantity,a.strItemName"
@@ -180,7 +188,7 @@ public class clsTextVoidKOT implements clsVoidKOTFormat
             {
                 objPrintingUtility.funShowTextFile(Text_KOT, "", "Printer Info!2");
             }
-            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false);
+            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false,"");
 
         }
         catch (Exception e)

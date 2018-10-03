@@ -1273,7 +1273,7 @@ public class clsTextFormat5ForVoidBillAudit implements clsVoidBillForAuditGenera
                     {
                         if (!viewORprint.equalsIgnoreCase("view"))
                         {
-                            objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+                            objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
                         }
                     }
                 }
@@ -1283,7 +1283,7 @@ public class clsTextFormat5ForVoidBillAudit implements clsVoidBillForAuditGenera
                     {
                         if (!viewORprint.equalsIgnoreCase("view"))
                         {
-                            objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint);
+                            objPrintingUtility.funPrintToPrinter(clsGlobalVarClass.gBillPrintPrinterPort, "", "bill", "N", isReprint,"");
                         }
                     }
                     else

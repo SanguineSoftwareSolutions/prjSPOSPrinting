@@ -407,7 +407,7 @@ public class clsTextFormat2ForAdvReceipt implements clsAdvReceiptGenerationForma
             int advCount = Integer.parseInt(clsGlobalVarClass.gAdvRecPrintCount);
             for (int i = 0; i < advCount; i++)
             {
-                objPrintingUtility.funPrintToPrinter(printerName, "", "Adv Receipt", "N", isReprint);
+                objPrintingUtility.funPrintToPrinter(printerName, "", "Adv Receipt", "N", isReprint,"");
             }
 
         }

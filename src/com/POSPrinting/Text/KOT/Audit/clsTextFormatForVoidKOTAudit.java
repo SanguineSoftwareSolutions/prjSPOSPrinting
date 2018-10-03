@@ -193,7 +193,7 @@ public class clsTextFormatForVoidKOTAudit implements clsVoidKOTForAuditGeneratio
             {
                 objPrintingUtility.funShowTextFile(Text_KOT, "", "Printer Info!2");
             }
-            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false);
+            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false,"");
 
         }
         catch (Exception e)

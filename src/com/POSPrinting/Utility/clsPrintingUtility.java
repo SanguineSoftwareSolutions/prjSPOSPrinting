@@ -169,7 +169,7 @@ public class clsPrintingUtility
      * @param printOnBothPrinters
      * @param isReprint
      */
-    public void funPrintToPrinter(String primaryPrinterName, String secPrinterName, String type, String printOnBothPrinters, boolean isReprint)
+    public void funPrintToPrinter(String primaryPrinterName, String secPrinterName, String type, String printOnBothPrinters, boolean isReprint,String costCenterCode)
     {
 	try
 	{
@@ -217,8 +217,27 @@ public class clsPrintingUtility
 			    {
 				funAppendDuplicate(fileName);
 			    }
+			    int noOfCopies = 0;
+			    String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+costCenterCode+"'";
+			    ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
+			    if (rsNoOfCopies.next())
+			    {
+				noOfCopies = rsNoOfCopies.getInt(1);
+			    }
+			    if(noOfCopies>1)
+			    {	
+				for(int i=0;i<noOfCopies-1;i++)
+				{	
+				funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
+				}
+			    }
+			    else
+			    {	
 			    funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
+			    }
+			    
 			}
+			   
 		    }
 		}
 		else if (type.equalsIgnoreCase("checkkot"))

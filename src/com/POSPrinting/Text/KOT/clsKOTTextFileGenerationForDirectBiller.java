@@ -299,7 +299,7 @@ public class clsKOTTextFileGenerationForDirectBiller
 	    ResultSet rsCostCenter = clsGlobalVarClass.dbMysql.executeResultSet(sql);
 	    if (rsCostCenter.next())
 	    {
-		objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint);
+		objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint,"");
 	    }
 	    rsCostCenter.close();
 
