@@ -395,8 +395,11 @@ public class clsTextFormatForForeignCurrencyForBill implements clsBillGeneration
 		    BillOut.newLine();
 
 		    // GST No    
+		    if(!rs_CustomerDtl.getString(9).equalsIgnoreCase(""))
+		    {	
 		    BillOut.write("  GST NO    :" + rs_CustomerDtl.getString(9));
 		    BillOut.newLine();
+		    }
 		}
 		rs_CustomerDtl.close();
 		if (null != rs_HomeDelivery.getString(3) && rs_HomeDelivery.getString(3).trim().length() > 0)
@@ -449,8 +452,11 @@ public class clsTextFormatForForeignCurrencyForBill implements clsBillGeneration
 		    BillOut.write("  MOBILE NO :" + rs_BillHD.getString(32));
 		    BillOut.newLine();
 		    // customer GST No    
+		    if(!rs_BillHD.getString(36).equalsIgnoreCase(""))
+		    {	
 		    BillOut.write("  GST NO    :" + rs_BillHD.getString(36));
 		    BillOut.newLine();
+		    }
 		}
 	    }
 	    rs_HomeDelivery.close();

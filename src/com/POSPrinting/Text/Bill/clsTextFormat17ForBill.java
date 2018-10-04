@@ -415,8 +415,11 @@ public class clsTextFormat17ForBill implements clsBillGenerationFormat
 		    // Mobile No    
 		    BillOut.write("  MOBILE NO :" + rs_BillHD.getString(32));
 		    BillOut.newLine();
+		    if(!rs_BillHD.getString(34).equalsIgnoreCase(""))
+		    {	
 		    BillOut.write("  GST NO :" + rs_BillHD.getString(34));
 		    BillOut.newLine();
+		    }
 		    isCustomerPrint = true;
 		}
 	    }

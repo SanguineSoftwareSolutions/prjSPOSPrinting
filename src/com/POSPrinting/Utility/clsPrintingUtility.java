@@ -217,7 +217,7 @@ public class clsPrintingUtility
 			    {
 				funAppendDuplicate(fileName);
 			    }
-			    int noOfCopies = 0;
+			    int noOfCopies = 1;
 			    String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+costCenterCode+"'";
 			    ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
 			    if (rsNoOfCopies.next())
@@ -230,12 +230,7 @@ public class clsPrintingUtility
 				{	
 				funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
 				}
-			    }
-			    else
-			    {	
-			    funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
-			    }
-			    
+			    }			    
 			}
 			   
 		    }

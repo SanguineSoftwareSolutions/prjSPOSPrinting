@@ -304,16 +304,35 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 		if (clsGlobalVarClass.gMultipleKOTPrint)
 		{
 		    objUtility2.funPrintJasperKOT(primary, print);
-		    objUtility2.funPrintJasperKOT(primary, print);
-
 		    objUtility2.funPrintJasperKOT(secondary, print);
-		    objUtility2.funPrintJasperKOT(secondary, print);
+		    if (clsGlobalVarClass.gMultipleKOTPrint)
+		    {
+			int noOfCopies = 1;
+			String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+CostCenterCode+"'";
+			ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
+			if (rsNoOfCopies.next())
+			{
+			    noOfCopies = rsNoOfCopies.getInt(1);
+			}
+			if(noOfCopies>1)
+			{	
+			    for(int i=0;i<noOfCopies-1;i++)
+			    {	
+			    objUtility2.funPrintJasperKOT(primary, print);
+			    objUtility2.funPrintJasperKOT(secondary, print);
+			    }
+		}	
+//		    objUtility2.funPrintJasperKOT(primary, print);
+//		    objUtility2.funPrintJasperKOT(primary, print);
+//
+//		    objUtility2.funPrintJasperKOT(secondary, print);
+//		    objUtility2.funPrintJasperKOT(secondary, print);
 		}
-		else
-		{
-		    objUtility2.funPrintJasperKOT(primary, print);
-		    objUtility2.funPrintJasperKOT(secondary, print);
-		}
+//		else
+//		{
+//		    objUtility2.funPrintJasperKOT(primary, print);
+//		    objUtility2.funPrintJasperKOT(secondary, print);
+//		}
 	    }
 	    else
 	    {
@@ -321,21 +340,45 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 		if (clsGlobalVarClass.gMultipleKOTPrint)
 		{
 		    if (!objUtility2.funPrintJasperKOT(primary, print))
-		    {
-			objUtility2.funPrintJasperKOT(secondary, print);
-		    }
-		    if (!objUtility2.funPrintJasperKOT(primary, print))
-		    {
-			objUtility2.funPrintJasperKOT(secondary, print);
-		    }
+			{
+			    objUtility2.funPrintJasperKOT(secondary, print);
+			}
+			  
+			int noOfCopies = 1;
+			String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+CostCenterCode+"'";
+			ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
+			if (rsNoOfCopies.next())
+			{
+			    noOfCopies = rsNoOfCopies.getInt(1);
+			}
+			if(noOfCopies>1)
+			{	
+			    for(int i=0;i<noOfCopies-1;i++)
+			    {	
+				if (!objUtility2.funPrintJasperKOT(primary, print))
+				{
+				    objUtility2.funPrintJasperKOT(secondary, print);
+				}
+				 
+			    }
+			}	
 		}
-		else
-		{
-		    if (!objUtility2.funPrintJasperKOT(primary, print))
-		    {
-			objUtility2.funPrintJasperKOT(secondary, print);
-		    }
+//		    if (!objUtility2.funPrintJasperKOT(primary, print))
+//		    {
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//		    }
+//		    if (!objUtility2.funPrintJasperKOT(primary, print))
+//		    {
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//		    }
 		}
+//		else
+//		{
+//		    if (!objUtility2.funPrintJasperKOT(primary, print))
+//		    {
+//			objUtility2.funPrintJasperKOT(secondary, print);
+//		    }
+//		}
 	    }
 
 	}
