@@ -57,7 +57,7 @@ public class clsKOTJasperFileGenerationForMakeKOT
      * @param NCKotYN
      * @param labelOnKOT
      */
-    public void funGenerateJasperForTableWiseKOT(String billingType, String tableNo, String CostCenterCode, String ShowKOT, String AreaCode, String KOTNO, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String printYN, String NCKotYN, String labelOnKOT)
+    public void funGenerateJasperForTableWiseKOT(String billingType, String tableNo, String CostCenterCode, String ShowKOT, String AreaCode, String KOTNO, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String printYN, String NCKotYN, String labelOnKOT,int primaryCopies,int secondaryCopies)
     {
 	HashMap hm = new HashMap();
 	List<List<clsBillDtl>> listData = new ArrayList<>();
@@ -66,11 +66,13 @@ public class clsKOTJasperFileGenerationForMakeKOT
 	{
 	    PreparedStatement pst = null;
 	    boolean isReprint = false;
-	    if ("Reprint".equalsIgnoreCase(Reprint))
-	    {
+	    if("Reprint".equalsIgnoreCase(Reprint))	
+	    {	
 		isReprint = true;
 		hm.put("dublicate", "[DUPLICATE]");
+	    
 	    }
+	    	
 	    if ("Y".equalsIgnoreCase(NCKotYN))
 	    {
 		hm.put("KOTorNC", "NCKOT");
@@ -273,84 +275,34 @@ public class clsKOTJasperFileGenerationForMakeKOT
 
 		if (printOnBothPrinters.equalsIgnoreCase("Y"))
 		{
-		    objUtility2.funPrintJasperKOT(primary, print);
-		    objUtility2.funPrintJasperKOT(secondary, print);
-//		    if (clsGlobalVarClass.gMultipleKOTPrint)
-//		    {
-//			int noOfCopies = 1;
-//			String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+CostCenterCode+"'";
-//			ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
-//			if (rsNoOfCopies.next())
-//			{
-//			    noOfCopies = rsNoOfCopies.getInt(1);
-//			}
-//			if(noOfCopies>1)
-//			{	
-//			    for(int i=0;i<noOfCopies-1;i++)
-//			    {	
-//			    objUtility2.funPrintJasperKOT(primary, print);
-//			    objUtility2.funPrintJasperKOT(secondary, print);
-//			    }
-//			}
-//		     }	
-//			objUtility2.funPrintJasperKOT(primary, print);
-//			objUtility2.funPrintJasperKOT(primary, print);
-//
-//			objUtility2.funPrintJasperKOT(secondary, print);
-//			objUtility2.funPrintJasperKOT(secondary, print);
-		   
-//		    else
-//		    {
-//			
-//			objUtility2.funPrintJasperKOT(primary, print);
-//			objUtility2.funPrintJasperKOT(secondary, print);
-//		    }
+		    for(int i=0;i<primaryCopies;i++)
+			{    
+			    objUtility2.funPrintJasperKOT(primary, print);
+			}
+		    	
+		    for(int i=0;i<secondaryCopies;i++)
+			{ 
+			    objUtility2.funPrintJasperKOT(secondary, print);
+			}
+		    	
+
 		}
 		else
 		{
 
 		    if (clsGlobalVarClass.gMultipleKOTPrint)
 		    {
-			if (!objUtility2.funPrintJasperKOT(primary, print))
-			{
-			    objUtility2.funPrintJasperKOT(secondary, print);
-			}
-			  
-//			int noOfCopies = 1;
-//			String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+CostCenterCode+"'";
-//			ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
-//			if (rsNoOfCopies.next())
-//			{
-//			    noOfCopies = rsNoOfCopies.getInt(1);
-//			}
-//			if(noOfCopies>1)
-//			{	
-//			    for(int i=0;i<noOfCopies-1;i++)
-//			    {	
-//				if (!objUtility2.funPrintJasperKOT(primary, print))
-//				{
-//				    objUtility2.funPrintJasperKOT(secondary, print);
-//				}
-//				   
-//			    }
-//			}	
-//			if (!objUtility2.funPrintJasperKOT(primary, print))
-//			{
-//			    objUtility2.funPrintJasperKOT(secondary, print);
-//			}
-//			if (!objUtility2.funPrintJasperKOT(primary, print))
-//			{
-//			    objUtility2.funPrintJasperKOT(secondary, print);
-//			}
+			for(int i=0;i<primaryCopies;i++)
+			    { 
+				if (!objUtility2.funPrintJasperKOT(primary, print))
+				{
+				    objUtility2.funPrintJasperKOT(secondary, print);
+				}   
+			    }
+			
 			
 		    }
-//		    else
-//		    {
-//			if (!objUtility2.funPrintJasperKOT(primary, print))
-//			{
-//			    objUtility2.funPrintJasperKOT(secondary, print);
-//			}
-//		    }
+
 		}
 	    }
 	}

@@ -57,7 +57,7 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
      * @param NCKotYN
      * @param labelOnKOT
      */
-    public void funGenerateJasperForTableWiseKOT(String billingType, String tableNo, String CostCenterCode, String ShowKOT, String AreaCode, String KOTNO, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String printYN, String NCKotYN, String labelOnKOT)
+    public void funGenerateJasperForTableWiseKOT(String billingType, String tableNo, String CostCenterCode, String ShowKOT, String AreaCode, String KOTNO, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String printYN, String NCKotYN, String labelOnKOT,int primaryCopies,int secondaryCopies)
     {
 	HashMap hm = new HashMap();
 	List<List<clsBillDtl>> listData = new ArrayList<>();
@@ -66,11 +66,13 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 	{
 	    PreparedStatement pst = null;
 	    boolean isReprint = false;
+	   
 	    if ("Reprint".equalsIgnoreCase(Reprint))
 	    {
 		isReprint = true;
 		hm.put("dublicate", "[DUPLICATE]");
 	    }
+	    
 	    if ("Y".equalsIgnoreCase(NCKotYN))
 	    {
 		hm.put("KOTorNC", "NCKOT");
@@ -303,8 +305,16 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 	    {
 		if (clsGlobalVarClass.gMultipleKOTPrint)
 		{
+		    for(int i=0;i<primaryCopies;i++)
+		    {	
 		    objUtility2.funPrintJasperKOT(primary, print);
+		    }
+		   
+		    for(int i=0;i<secondaryCopies;i++)
+		    {	
 		    objUtility2.funPrintJasperKOT(secondary, print);
+		    }
+		    
 //		    if (clsGlobalVarClass.gMultipleKOTPrint)
 //		    {
 //			int noOfCopies = 1;
@@ -335,15 +345,21 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 //		    objUtility2.funPrintJasperKOT(secondary, print);
 //		}
 	    }
+	    }
 	    else
 	    {
 
 		if (clsGlobalVarClass.gMultipleKOTPrint)
 		{
+		    
+		    for(int i=0;i<primaryCopies;i++)
+		    {	
 		    if (!objUtility2.funPrintJasperKOT(primary, print))
 			{
 			    objUtility2.funPrintJasperKOT(secondary, print);
 			}
+		    }
+		    
 			  
 //			int noOfCopies = 1;
 //			String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+CostCenterCode+"'";
@@ -380,7 +396,7 @@ public class clsKOTJasperFormat2FileGenerationForMakeKOT
 //			objUtility2.funPrintJasperKOT(secondary, print);
 //		    }
 //		}
-	    }
+	   
 
 	}
 	catch (Exception e)

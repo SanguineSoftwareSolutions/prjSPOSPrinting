@@ -210,27 +210,20 @@ public class clsPrintingUtility
 		    //System.out.println("G Print YN="+clsGlobalVarClass.gPrintKOTYN);
 		    if (clsGlobalVarClass.gPrintKOTYN)
 		    {
-			funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
-			if (clsGlobalVarClass.gMultipleKOTPrint)
+			String sql = "select a.intPrimaryPrinterNoOfCopies,a.intSecondaryPrinterNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+costCenterCode+"'";
+			ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
+			if(rsNoOfCopies.next())
 			{
-			    if (!isReprint)
-			    {
-				funAppendDuplicate(fileName);
-			    }
-			    int noOfCopies = 1;
-			    String sql = "select a.intCostCenterWiseNoOfCopies from tblcostcentermaster a where a.strCostCenterCode='"+costCenterCode+"'";
-			    ResultSet rsNoOfCopies = clsGlobalVarClass.dbMysql.executeResultSet(sql);
-			    if (rsNoOfCopies.next())
-			    {
-				noOfCopies = rsNoOfCopies.getInt(1);
-			    }
-			    if(noOfCopies>1)
-			    {	
-				for(int i=0;i<noOfCopies-1;i++)
-				{	
-				funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters);
-				}
-			    }			    
+			funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters,rsNoOfCopies.getInt(1),rsNoOfCopies.getInt(2),isReprint);
+//			if (clsGlobalVarClass.gMultipleKOTPrint)
+//			{
+//			    if (!isReprint)
+//			    {
+//				funAppendDuplicate(fileName);
+//			    }
+//			    funPrintKOTWindows(primaryPrinterName, secPrinterName, printOnBothPrinters,rsNoOfCopies.getInt(1),rsNoOfCopies.getInt(2),isReprint);
+//			    
+//			    }			    
 			}
 			   
 		    }
@@ -323,7 +316,7 @@ public class clsPrintingUtility
 	}
     }
 
-    private void funPrintKOTWindows(String primaryPrinterName, String secPrinterName, String printOnBothPrinters)
+    private void funPrintKOTWindows(String primaryPrinterName, String secPrinterName, String printOnBothPrinters,int primaryPrinterNoOfCopies,int secondaryPrinterNoOfCopies,Boolean isReprint)
     {
 	String filePath = System.getProperty("user.dir");
 	String fileName = (filePath + "/Temp/Temp_KOT.txt");
@@ -380,12 +373,49 @@ public class clsPrintingUtility
 		}
 		if (printOnBothPrinters.equals("Y"))
 		{
+		    
 		    funPrintOnSecPrinter(secPrinterName, fileName);
+		    if (!isReprint)
+		    {
+			isReprint=true;
+			funAppendDuplicate(fileName);
+		    }
+		    for(int i=0;i<secondaryPrinterNoOfCopies-1;i++)
+		    {
+			funPrintOnSecPrinter(secPrinterName, fileName);
+		    }
 		}
+		if(primaryPrinterNoOfCopies>1)
+		{
+		    	if (!isReprint)
+			{
+			    isReprint=true;
+			    funAppendDuplicate(fileName);
+			}
+			for(int i=0;i<primaryPrinterNoOfCopies-1;i++)
+			{
+			    job = printService[printerIndex].createPrintJob();
+			    fis = new FileInputStream(fileName);
+			    das = new HashDocAttributeSet();
+			    doc = new SimpleDoc(fis, flavor, das);
+			
+			    job.print(doc, pras);
+			}
+		    
+		}    
+		
+		
 	    }
 	    else
 	    {
-		funPrintOnSecPrinter(secPrinterName, fileName);
+		    if (!isReprint)
+		    {
+			funAppendDuplicate(fileName);
+		    }
+		    for(int i=0;i<secondaryPrinterNoOfCopies;i++)
+		    {
+			funPrintOnSecPrinter(secPrinterName, fileName);
+		    }
 		//JOptionPane.showMessageDialog(null,primaryPrinterName+" Printer Not Found");
 	    }
 	}

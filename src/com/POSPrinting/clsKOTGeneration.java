@@ -61,6 +61,7 @@ public class clsKOTGeneration
 
     }
 
+    
     /**
      *
      * @param tableNo
@@ -110,7 +111,7 @@ public class clsKOTGeneration
 		    }
 		    rsAreaCode.close();
 		    sql = "select a.strItemName,a.strNCKotYN,d.strCostCenterCode,d.strPrimaryPrinterPort,d.strSecondaryPrinterPort,d.strCostCenterName "
-			    + " ,ifnull(e.strLabelOnKOT,'KOT') strLabelOnKOT,sum(a.dblPrintQty),e.intCostCenterWiseNoOfCopies "
+			    + " ,ifnull(e.strLabelOnKOT,'KOT') strLabelOnKOT,sum(a.dblPrintQty),e.intPrimaryPrinterNoOfCopies,e.intSecondaryPrinterNoOfCopies "
 			    + " from tblitemrtemp a "
 			    + " left outer join " + pricingTable + " c on a.strItemCode = c.strItemCode "
 			    + " left outer join tblprintersetup d on c.strCostCenterCode=d.strCostCenterCode "
@@ -140,35 +141,40 @@ public class clsKOTGeneration
 			    if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("239.001"))//urbo
 			    {
 				objJasperFormat2FileGenerationForMakeKOT = new clsKOTJasperFormat2FileGenerationForMakeKOT();
-				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),1,1);
 				if(Integer.parseInt(rsPrint.getString(9))>1)
 				{
 				    for(int i=0;i<Integer.parseInt(rsPrint.getString(9))-1;i++)
-				    {	
-				    objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				    {  
+					objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),rsPrint.getInt(9)-1,0);
 				    }
-				}   
-				 
-//				if (clsGlobalVarClass.gMultipleKOTPrint)
-//				{
-//				    objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Rerint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
-//				}
+				}
+				if(Integer.parseInt(rsPrint.getString(10))>1)
+				{
+				    for(int i=0;i<Integer.parseInt(rsPrint.getString(10))-1;i++)
+				    {  
+					objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),rsPrint.getInt(10)-1,0);
+				    }
+				}
+
 			    }
 			    else
 			    {
-				objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
+				objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),1,1);
 				if(Integer.parseInt(rsPrint.getString(9))>1)
 				{
 				    for(int i=0;i<Integer.parseInt(rsPrint.getString(9))-1;i++)
 				    {
-					objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));  
+					objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),rsPrint.getInt(9)-1,0);  
 				    }
-				}
-				
-//				if (clsGlobalVarClass.gMultipleKOTPrint)
-//				{
-//				    objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7));
-//				}
+				}    
+				if(Integer.parseInt(rsPrint.getString(10))>1)
+				{
+				    for(int i=0;i<Integer.parseInt(rsPrint.getString(10))-1;i++)
+				    {
+					objKOTJasperFileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, "Reprint", rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),0,rsPrint.getInt(10)-1);  
+				    }
+				}    
 			    }
 			}
 			else if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("171.001") && clsGlobalVarClass.gPrintType.equals("Text File"))//china grill-pimpri menu head wise items kot format
@@ -196,7 +202,7 @@ public class clsKOTGeneration
 		case "DirectBiller":
 
 		    sql = "select a.strItemName,c.strCostCenterCode,c.strPrimaryPrinterPort "
-			    + ",c.strSecondaryPrinterPort,c.strCostCenterName,d.strLabelOnKOT,d.intCostCenterWiseNoOfCopies "
+			    + ",c.strSecondaryPrinterPort,c.strCostCenterName,d.strLabelOnKOT,d.intPrimaryPrinterNoOfCopies,d.intSecondaryPrinterNoOfCopies "
 			    + " from tblbilldtl  a,tblmenuitempricingdtl b,tblprintersetup c,tblcostcentermaster d   "
 			    + " where a.strBillNo=? "
 			    + " and  a.strItemCode=b.strItemCode "
@@ -214,12 +220,19 @@ public class clsKOTGeneration
 			//funGenerateTextFileForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDirectAreaCode, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5));
 			if (clsGlobalVarClass.gPrintType.equals("Jasper"))
 			{
-			    objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6));
+			    objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),1, 1);
 			    if(Integer.parseInt(rsPrintDirect.getString(7))>1)
 			    {
 				for(int i=0;i<Integer.parseInt(rsPrintDirect.getString(7))-1;i++)
 				{    
-				objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, "Reprint", rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6));
+				objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, "Reprint", rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),rsPrintDirect.getInt(7)-1,0);
+				}
+			    }
+			    if(Integer.parseInt(rsPrintDirect.getString(8))>1)
+			    {
+				for(int i=0;i<Integer.parseInt(rsPrintDirect.getString(8))-1;i++)
+				{    
+				objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, "Reprint", rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),0,rsPrintDirect.getInt(8)-1);
 				}
 			    }
 			    

@@ -46,7 +46,7 @@ public class clsTextVoidKOT implements clsVoidKOTFormat
      * @param mapVoidedItem
      */
     @Override
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem)
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies)
     {
         String sqlVOIDKOT_waiterName = "";
 

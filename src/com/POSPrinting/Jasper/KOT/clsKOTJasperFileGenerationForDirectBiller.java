@@ -52,7 +52,7 @@ public class clsKOTJasperFileGenerationForDirectBiller
      * @param CostCenterName
      * @param labelOnKOT
      */
-    public void funGenerateJasperForKOTDirectBiller(String CostCenterCode, String ShowKOT, String AreaCode, String BillNo, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String labelOnKOT)
+    public void funGenerateJasperForKOTDirectBiller(String CostCenterCode, String ShowKOT, String AreaCode, String BillNo, String Reprint, String primaryPrinterName, String secondaryPrinterName, String CostCenterName, String labelOnKOT,int primaryCopies,int secondaryCopies)
     {
         HashMap hm = new HashMap();
         List<List<clsBillDtl>> listData = new ArrayList<>();
@@ -60,11 +60,13 @@ public class clsKOTJasperFileGenerationForDirectBiller
         {
             PreparedStatement pst = null;
             boolean isReprint = false;
+	    
             if ("Reprint".equalsIgnoreCase(Reprint))
             {
                 isReprint = true;
                 hm.put("dublicate", "[DUPLICATE]");
             }
+	    
             else
             {
                 hm.put("dublicate", "");
@@ -275,16 +277,28 @@ public class clsKOTJasperFileGenerationForDirectBiller
                 {
                     if (clsGlobalVarClass.gMultipleKOTPrint)
                     {
-                        objUtility2.funPrintJasperKOT(primary, print);
-                        objUtility2.funPrintJasperKOT(primary, print);
-
-                        objUtility2.funPrintJasperKOT(secondary, print);
-                        objUtility2.funPrintJasperKOT(secondary, print);
+                       for(int i=0;i<primaryCopies;i++)
+			{   
+			    objUtility2.funPrintJasperKOT(primary, print);
+			}
+			
+			for(int i=0;i<secondaryCopies;i++)
+			{   
+			    objUtility2.funPrintJasperKOT(secondary, print);
+			}
+			
                     }
                     else
                     {
-                        objUtility2.funPrintJasperKOT(primary, print);
-                        objUtility2.funPrintJasperKOT(secondary, print);
+                        for(int i=0;i<primaryCopies;i++)
+			{
+			objUtility2.funPrintJasperKOT(primary, print);
+			}
+                        for(int i=0;i<secondaryCopies;i++)
+			{   
+			    objUtility2.funPrintJasperKOT(secondary, print);
+			}
+			
                     }
                 }
                 else
@@ -292,21 +306,30 @@ public class clsKOTJasperFileGenerationForDirectBiller
 
                     if (clsGlobalVarClass.gMultipleKOTPrint)
                     {
+                        for(int i=0;i<primaryCopies;i++)
+			{
+			if (!objUtility2.funPrintJasperKOT(primary, print))
+                        {
+                            objUtility2.funPrintJasperKOT(secondary, print);
+                        }
+			}
+			for(int i=0;i<secondaryCopies;i++)
+			{
                         if (!objUtility2.funPrintJasperKOT(primary, print))
                         {
                             objUtility2.funPrintJasperKOT(secondary, print);
                         }
-                        if (!objUtility2.funPrintJasperKOT(primary, print))
-                        {
-                            objUtility2.funPrintJasperKOT(secondary, print);
-                        }
+			}
                     }
                     else
                     {
-                        if (!objUtility2.funPrintJasperKOT(primary, print))
+                        for(int i=0;i<primaryCopies;i++)
+			{
+			if (!objUtility2.funPrintJasperKOT(primary, print))
                         {
                             objUtility2.funPrintJasperKOT(secondary, print);
                         }
+			}
                     }
                 }
             }

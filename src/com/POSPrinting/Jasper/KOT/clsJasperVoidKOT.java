@@ -65,7 +65,7 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
      * @param mapVoidedItem
      */
     @Override
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem)
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies)
     {
         HashMap hm = new HashMap();
         List<List<clsBillDtl>> listData = new ArrayList<>();
@@ -224,9 +224,12 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
             //--- Set print properties
             PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
             printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+	    
+	    
             if (clsGlobalVarClass.gMultipleKOTPrint)
             {
-                printRequestAttributeSet.add(new Copies(2));
+//                printRequestAttributeSet.add(new Copies(2));
+		printRequestAttributeSet.add(new Copies(costCenterWiseCopies));
             }
 
             //----------------------------------------------------     

@@ -295,11 +295,13 @@ public class clsKOTTextFileGenerationForDirectBiller
 		funGenerateTextFileItemWiseKOTForDirectBiller(costCenterCode, areaCode, billNo, reprint, primaryPrinterName, secondaryPrinterName, costCenterName);
 	    }
 
-	    String sql = "select strPrintOnBothPrinters from tblcostcentermaster where strCostCenterCode='" + costCenterCode + "'";
+	    String sql = "select strPrintOnBothPrinters,intPrimaryPrinterNoOfCopies,intSecondaryPrinterNoOfCopies from tblcostcentermaster where strCostCenterCode='" + costCenterCode + "'";
 	    ResultSet rsCostCenter = clsGlobalVarClass.dbMysql.executeResultSet(sql);
 	    if (rsCostCenter.next())
 	    {
-		objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint,"");
+		   
+		objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", rsCostCenter.getString(1), isReprint,costCenterCode);
+		
 	    }
 	    rsCostCenter.close();
 

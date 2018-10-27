@@ -22,5 +22,5 @@ public interface clsVoidKOTFormat
      * @param costCenterCode
      * @param mapVoidedItem
      */
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem);
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies);
 }
