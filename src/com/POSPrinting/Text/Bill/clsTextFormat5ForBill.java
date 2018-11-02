@@ -257,6 +257,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		BillOut.write("VOIDED BILL");
 		BillOut.newLine();
 	    }
+	    deliveryCharge = rs_BillHD.getString(13);
 	    boolean flag_isHomeDelvBill = false;
 	    String SQL_HomeDelivery = "select strBillNo,strCustomerCode,strDPCode,tmeTime,strCustAddressLine1 ,dblHomeDeliCharge "
 		    + "from tblhomedelivery "
@@ -880,10 +881,10 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    }
 	    if (!clsGlobalVarClass.gClientCode.equalsIgnoreCase("247.001"))// BHAGAT TARACHAND
 	    {
-		BillOut.write("  TEL NO.   :" + " ");
+		BillOut.write("  TEL NO.    :" + " ");
 		BillOut.write(String.valueOf(clsGlobalVarClass.gClientTelNo));
 		BillOut.newLine();
-		BillOut.write("  EMAIL ID  :" + " ");
+		BillOut.write("  EMAIL ID   :" + " ");
 		BillOut.write(clsGlobalVarClass.gClientEmail);
 		BillOut.newLine();
 	    }
@@ -913,8 +914,14 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    String kotToBillNote = rs_BillHD.getString(37);
 	    if (kotToBillNote.trim().length() > 0)
 	    {
-		BillOut.write("  ZOMATO CODE:" + "  ");
-		BillOut.write(kotToBillNote);
+		if(kotToBillNote.contains("OrderFrom")){
+		    //get online Order service provider name and Code (For Wera service) //OrderFromONLINE 304595
+		    objPrintingUtility.funPrintContentWithSpace("Right", "  "+kotToBillNote.substring(9, kotToBillNote.indexOf(" "))+" CODE", 13, BillOut);
+		    BillOut.write(": "+kotToBillNote.split(" ")[1]);
+		}else{
+		    BillOut.write("  ZOMATO CODE:" + "  ");
+		    BillOut.write(kotToBillNote);
+		}
 		BillOut.newLine();
 	    }
 
@@ -969,7 +976,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    subTotal = rs_BillHD.getString(6);
 	    grandTotal = rs_BillHD.getString(8);
 	    user = rs_BillHD.getString(12);
-	    //deliveryCharge = rs_BillHD.getString(13);
+	    
 	    advAmount = rs_BillHD.getString(14);
 	    //print card available balance
 	    String isSttled = "select a.strBillNo from " + billSettlementdtl + " a," + billhd + " b "
@@ -1559,7 +1566,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 	    }
 	    if (deliveryCharge != null && deliveryCharge.trim().length() > 0 && !"0.00".equalsIgnoreCase(deliveryCharge))
 	    {
-		objPrintingUtility.funWriteTotal("DELV. CHARGE", gDecimalFormat.format(Double.parseDouble(deliveryCharge)), BillOut, "Format5");
+		objPrintingUtility.funWriteTotal("DELV./PACKING CHARGE", gDecimalFormat.format(Double.parseDouble(deliveryCharge)), BillOut, "Format5");
 		BillOut.newLine();
 	    }
 	    if (advAmount.trim().length() > 0 && !"0.00".equalsIgnoreCase(advAmount))

@@ -20,11 +20,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.HashPrintServiceAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.PrinterName;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.swing.JRViewer;
 
 /**
@@ -930,7 +940,7 @@ public class clsJasperFormat10ForBill implements clsBillGenerationFormat
 			{
 			    if (viewORprint.equalsIgnoreCase("print"))
 			    {
-				objPrintingUtility.funPrintJasperExporterInThread(print);
+				funPrintJasperExporterInThread(print);
 			    }
 			}
 		    }.start();
@@ -945,7 +955,7 @@ public class clsJasperFormat10ForBill implements clsBillGenerationFormat
 		    {
 			if (viewORprint.equalsIgnoreCase("print"))
 			{
-			    objPrintingUtility.funPrintJasperExporterInThread(print);
+			    funPrintJasperExporterInThread(print);
 			}
 		    }
 		}.start();
@@ -989,6 +999,52 @@ public class clsJasperFormat10ForBill implements clsBillGenerationFormat
 	{
 	    e.printStackTrace();
 	}
+    }
+    
+    
+    
+    /**
+     *
+     * @param print
+     */
+    public void funPrintJasperExporterInThread(JasperPrint print)
+    {
+	JRPrintServiceExporter exporter = new JRPrintServiceExporter();
+
+	//--- Set print properties
+	PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+	// printRequestAttributeSet.add(MediaSizeName.ISO_A6);
+	// printRequestAttributeSet.add(MediaSizeName.MONARCH_ENVELOPE);
+
+	printRequestAttributeSet.add(new Copies(1));
+
+	//----------------------------------------------------     
+	//printRequestAttributeSet.add(new Destination(new java.net.URI("file:d:/output/report.ps")));
+	//----------------------------------------------------     
+	PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
+
+	String billPrinterName = clsGlobalVarClass.gBillPrintPrinterPort;
+
+	billPrinterName = billPrinterName.replaceAll("#", "\\\\");
+	printServiceAttributeSet.add(new PrinterName(billPrinterName, null));
+
+	//--- Set print parameters      
+	exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
+	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_REQUEST_ATTRIBUTE_SET, printRequestAttributeSet);
+	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSet);
+	exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
+	exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
+
+	//--- Print the document
+	try
+	{
+	    exporter.exportReport();
+	}
+	catch (JRException e)
+	{
+	    e.printStackTrace();
+	}
+
     }
 
 }

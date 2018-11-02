@@ -65,7 +65,7 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
      * @param mapVoidedItem
      */
     @Override
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies)
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies,String Reprint)
     {
         HashMap hm = new HashMap();
         List<List<clsBillDtl>> listData = new ArrayList<>();
@@ -77,6 +77,19 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
         {
 
             hm.put("imagePath", imagePath);
+	    
+	    boolean isReprint = false;
+	    if ("Reprint".equalsIgnoreCase(Reprint))
+            {
+                isReprint = true;
+                hm.put("dublicate", "[DUPLICATE]");
+            }
+	    else
+            {
+                hm.put("dublicate", "");
+            }
+         
+	    
 	    if(clsGlobalVarClass.gClientCode.equals("239.001")){
 		hm.put("KOTorNC", "Cancel KOT");
 	    }else{
@@ -205,9 +218,8 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
             hm.put("listOfItemDtl", listOfKOTDetail);
             listData.add(listOfKOTDetail);
             String reportName = "com/POSGlobal/reports/rptGenrateVoidKOTJasperReport.jasper";
-            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(listData);
+	    JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(listData);
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportName);
-
             JasperPrint print = JasperFillManager.fillReport(is, hm, beanColDataSource);
             JRViewer viewer = new JRViewer(print);
             JFrame jf = new JFrame();
@@ -219,44 +231,101 @@ public class clsJasperVoidKOT implements clsVoidKOTFormat
                 jf.setSize(new Dimension(500, 900));
                 jf.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             }
-            JRPrintServiceExporter exporter = new JRPrintServiceExporter();
+	    ResultSet rsPrinter = clsGlobalVarClass.dbMysql.executeResultSet("select a.strPrinterPort,a.strSecondaryPrinterPort,a.strPrintOnBothPrinters from tblcostcentermaster  a where a.strCostCenterCode='" + costCenterCode + "' ");
+            if (rsPrinter.next())
+            {
+                String primary = rsPrinter.getString(1);
+                String secondary = rsPrinter.getString(2);
+                String printOnBothPrinters = rsPrinter.getString(3);
 
-            //--- Set print properties
-            PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
-            printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+                //primary = primary.replaceAll("#", "\\\\");
+                //printServiceAttributeSet.add(new PrinterName(primary, null));
+                primary = primary.replaceAll("#", "\\\\");
+                secondary = secondary.replaceAll("#", "\\\\");
+
+                if (printOnBothPrinters.equalsIgnoreCase("Y"))
+                {
+                    if (clsGlobalVarClass.gMultipleKOTPrint)
+                    {
+                       for(int i=0;i<costCenterWiseCopies;i++)
+			{   
+			    objUtility2.funPrintJasperKOT(primary, print);
+			}
+		    }
+                    
+                }
+                else
+                {
+
+                    if (clsGlobalVarClass.gMultipleKOTPrint)
+                    {
+                        for(int i=0;i<costCenterWiseCopies;i++)
+			{
+			if (!objUtility2.funPrintJasperKOT(primary, print))
+                        {
+                            objUtility2.funPrintJasperKOT(secondary, print);
+                        }
+			}
+			
+                    }
+                    
+                }
+            }
+
 	    
-	    
-            if (clsGlobalVarClass.gMultipleKOTPrint)
-            {
-//                printRequestAttributeSet.add(new Copies(2));
-		printRequestAttributeSet.add(new Copies(costCenterWiseCopies));
-            }
-
-            //----------------------------------------------------     
-            //printRequestAttributeSet.add(new Destination(new java.net.URI("file:d:/output/report.ps")));
-            //----------------------------------------------------     
-            PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
-
-            String kotPrinterName = primaryPrinterName;
-            kotPrinterName = kotPrinterName.replaceAll("#", "\\\\");
-            printServiceAttributeSet.add(new PrinterName(kotPrinterName, null));
-
-            //--- Set print parameters      
-            exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
-            exporter.setParameter(JRPrintServiceExporterParameter.PRINT_REQUEST_ATTRIBUTE_SET, printRequestAttributeSet);
-            exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSet);
-            exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
-            exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
-
-            //--- Print the document
-            try
-            {
-                exporter.exportReport();
-            }
-            catch (JRException e)
-            {
-                e.printStackTrace();
-            }
+//            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(listData);
+//            InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportName);
+//
+//            JasperPrint print = JasperFillManager.fillReport(is, hm, beanColDataSource);
+//            JRViewer viewer = new JRViewer(print);
+//            JFrame jf = new JFrame();
+//            jf.getContentPane().add(viewer);
+//            jf.validate();
+//            if (clsGlobalVarClass.gShowBill)
+//            {
+//                jf.setVisible(true);
+//                jf.setSize(new Dimension(500, 900));
+//                jf.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//            }
+//            JRPrintServiceExporter exporter = new JRPrintServiceExporter();
+//
+//            //--- Set print properties
+//            PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+//            printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+//	    
+//	    
+//            if (clsGlobalVarClass.gMultipleKOTPrint)
+//            {
+////                printRequestAttributeSet.add(new Copies(2));
+//		
+//		printRequestAttributeSet.add(new Copies(costCenterWiseCopies));
+//            }
+//
+//            //----------------------------------------------------     
+//            //printRequestAttributeSet.add(new Destination(new java.net.URI("file:d:/output/report.ps")));
+//            //----------------------------------------------------     
+//            PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
+//
+//            String kotPrinterName = primaryPrinterName;
+//            kotPrinterName = kotPrinterName.replaceAll("#", "\\\\");
+//            printServiceAttributeSet.add(new PrinterName(kotPrinterName, null));
+//
+//            //--- Set print parameters      
+//            exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
+//            exporter.setParameter(JRPrintServiceExporterParameter.PRINT_REQUEST_ATTRIBUTE_SET, printRequestAttributeSet);
+//            exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSet);
+//            exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
+//            exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
+//
+//            //--- Print the document
+//            try
+//            {
+//                exporter.exportReport();
+//            }
+//            catch (JRException e)
+//            {
+//                e.printStackTrace();
+//            }
 
         }
         catch (Exception e)

@@ -141,7 +141,11 @@ public class clsKOTGeneration
 			    if (clsGlobalVarClass.gClientCode.equalsIgnoreCase("239.001"))//urbo
 			    {
 				objJasperFormat2FileGenerationForMakeKOT = new clsKOTJasperFormat2FileGenerationForMakeKOT();
-				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),1,1);
+				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),1,0);
+				if(Integer.parseInt(rsPrint.getString(10))>1)
+				{    
+				objJasperFormat2FileGenerationForMakeKOT.funGenerateJasperForTableWiseKOT("Dina", tableNo, rsPrint.getString(3), "", areaCodeForAll, KOTNo, reprint, rsPrint.getString(4), rsPrint.getString(5), rsPrint.getString(6), printYN, rsPrint.getString(2), rsPrint.getString(7),0,1);
+				}
 				if(Integer.parseInt(rsPrint.getString(9))>1)
 				{
 				    for(int i=0;i<Integer.parseInt(rsPrint.getString(9))-1;i++)
@@ -220,7 +224,11 @@ public class clsKOTGeneration
 			//funGenerateTextFileForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDirectAreaCode, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5));
 			if (clsGlobalVarClass.gPrintType.equals("Jasper"))
 			{
-			    objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),1, 1);
+			    objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),1, 0);
+			    if(Integer.parseInt(rsPrintDirect.getString(8))>1)
+			    {
+			    objKOTJasperFileGenerationForDirectBiller.funGenerateJasperForKOTDirectBiller(rsPrintDirect.getString(2), "", clsGlobalVarClass.gDineInAreaForDirectBiller, billNo, reprint, rsPrintDirect.getString(3), rsPrintDirect.getString(4), rsPrintDirect.getString(5), rsPrintDirect.getString(6),0, 1);
+			    }
 			    if(Integer.parseInt(rsPrintDirect.getString(7))>1)
 			    {
 				for(int i=0;i<Integer.parseInt(rsPrintDirect.getString(7))-1;i++)

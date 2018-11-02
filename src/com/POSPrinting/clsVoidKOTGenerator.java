@@ -29,17 +29,18 @@ public class clsVoidKOTGenerator
      * @param costCenterCode
      * @param mapVoidedItem
      */
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies)
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies,String reprint)
     {
         if (clsGlobalVarClass.gPrintType.equals("Jasper"))
         {
             objVoidKOTFormat=new clsJasperVoidKOT();
-            objVoidKOTFormat.funGenerateVoidKOT(KOT_TableNo, KotNo, text, costCenterCode, mapVoidedItem,costCenterWiseCopies);
+	    objVoidKOTFormat.funGenerateVoidKOT(KOT_TableNo, KotNo, text, costCenterCode, mapVoidedItem,costCenterWiseCopies,reprint);
+	    
         }
         else//text
         {
             objVoidKOTFormat=new clsTextVoidKOT();
-            objVoidKOTFormat.funGenerateVoidKOT(KOT_TableNo, KotNo, text, costCenterCode, mapVoidedItem,costCenterWiseCopies);
+            objVoidKOTFormat.funGenerateVoidKOT(KOT_TableNo, KotNo, text, costCenterCode, mapVoidedItem,costCenterWiseCopies,"");
         }
     }
 }

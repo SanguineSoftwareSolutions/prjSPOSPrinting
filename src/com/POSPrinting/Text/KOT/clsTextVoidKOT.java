@@ -46,7 +46,7 @@ public class clsTextVoidKOT implements clsVoidKOTFormat
      * @param mapVoidedItem
      */
     @Override
-    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies)
+    public void funGenerateVoidKOT(String KOT_TableNo, String KotNo, String text, String costCenterCode, HashMap<String, String> mapVoidedItem,int costCenterWiseCopies,String reprint)
     {
         String sqlVOIDKOT_waiterName = "";
 
@@ -188,7 +188,7 @@ public class clsTextVoidKOT implements clsVoidKOTFormat
             {
                 objPrintingUtility.funShowTextFile(Text_KOT, "", "Printer Info!2");
             }
-            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false,"");
+            objPrintingUtility.funPrintToPrinter(primaryPrinterName, secondaryPrinterName, "kot", "N", false,costCenterCode);
 
         }
         catch (Exception e)
