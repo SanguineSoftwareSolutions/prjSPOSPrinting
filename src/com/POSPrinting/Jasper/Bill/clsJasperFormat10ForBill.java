@@ -264,6 +264,14 @@ public class clsJasperFormat10ForBill implements clsBillGenerationFormat
 			fullAddress.append(objBillDtl.getStrItemName());
 			listOfHomeDeliveryDtl.add(objBillDtl);
 		    }
+		    
+		    if (rs_CustomerDtl.getString(5).trim().length() > 0)
+		    {
+			objBillDtl = new clsBillDtl();
+			objBillDtl.setStrItemName(rs_CustomerDtl.getString(5).toUpperCase());//"Area   :" +
+			fullAddress.append(objBillDtl.getStrItemName());
+			listOfHomeDeliveryDtl.add(objBillDtl);
+		    }
 
 		    if (rs_CustomerDtl.getString(6).trim().length() > 0)
 		    {
