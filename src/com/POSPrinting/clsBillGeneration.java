@@ -39,6 +39,7 @@ import com.POSPrinting.Text.Bill.clsTextFormat9ForBill;
 import com.POSPrinting.Text.Bill.clsTextFormatForPlayZone;
 import com.POSPrinting.Text.Bill.clsTextFormatSaloonForBill;
 import com.POSPrinting.Text.Bill.clsTextFormat21ForBill;
+import com.POSPrinting.Text.Bill.clsTextFormat22ForBill;
 import com.POSPrinting.Text.Bill.clsTextFormatForForeignCurrencyForBill;
 
 /*
@@ -155,6 +156,11 @@ public class clsBillGeneration
 		objBillGenerationFormat = new clsTextFormat21ForBill();//for Bill series  
 		break;
 
+	    
+	    case "Text 22":
+	    objBillGenerationFormat = new clsTextFormat22ForBill();//for Bill series  
+	    break;
+    
 	    case "Text PlayZone":
 		objBillGenerationFormat = new clsTextFormatForPlayZone();//for PlayZone and HSN No on bill
 		break;
@@ -218,6 +224,7 @@ public class clsBillGeneration
 	    case "Saloon 1":
 		objBillGenerationFormat = new clsTextFormatSaloonForBill();//for Saloon
 		break;
+		
 	}
 
 	if (objBillGenerationFormat == null)

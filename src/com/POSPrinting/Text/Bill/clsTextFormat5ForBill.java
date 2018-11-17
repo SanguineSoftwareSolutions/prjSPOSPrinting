@@ -1564,7 +1564,7 @@ public class clsTextFormat5ForBill implements clsBillGenerationFormat
 		    BillOut.newLine();
 		}
 	    }
-	    if (deliveryCharge != null && deliveryCharge.trim().length() > 0 && !"0.00".equalsIgnoreCase(deliveryCharge))
+	    if (deliveryCharge != null && deliveryCharge.trim().length() > 0 && !"0.00".equalsIgnoreCase(deliveryCharge)&& !"0.0000".equalsIgnoreCase(deliveryCharge))
 	    {
 		objPrintingUtility.funWriteTotal("DELV./PACKING CHARGE", gDecimalFormat.format(Double.parseDouble(deliveryCharge)), BillOut, "Format5");
 		BillOut.newLine();
