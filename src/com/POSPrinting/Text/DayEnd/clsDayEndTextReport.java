@@ -275,10 +275,18 @@ public class clsDayEndTextReport
 
 		objPrintingUtility.funWriteTotal("25. No. OF DISCOUNTED BILLS", decimalFormatForInt.format(rsDayend.getDouble(35)), bufferedWriter, "");
 		bufferedWriter.newLine();
-
-		objPrintingUtility.funWriteTotal("26. No. OF VOID KOT", decimalFormatForInt.format(rsDayend.getDouble(31)), bufferedWriter, "");
+		
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("select count(distinct(a.strKOTNo)) from tblvoidkot a" 
+		    + " where date(a.dteVoidedDate)='"+billDate+"'" 
+		    + " and a.strType='VKot'");
+		ResultSet rs = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
+		if(rs.next())
+		{   
+		objPrintingUtility.funWriteTotal("26. No. OF VOID KOT", decimalFormatForInt.format(rs.getInt(1)), bufferedWriter, "");
 		bufferedWriter.newLine();
-
+		}
+		rs.close();
 		objPrintingUtility.funWriteTotal("27. Used Card Balance", gDecimalFormat.format(rsDayend.getDouble(32)), bufferedWriter, "");
 		bufferedWriter.newLine();
 
@@ -293,6 +301,18 @@ public class clsDayEndTextReport
 		bufferedWriter.newLine();
 		//>> tip amount
 
+		sqlBuilder.setLength(0);
+		sqlBuilder.append("select count(distinct(a.strKOTNo)) from tblvoidkot a" 
+		    + " where date(a.dteVoidedDate)='"+billDate+"'" 
+		    + " and a.strType='MVKot'");
+		rs = clsGlobalVarClass.dbMysql.executeResultSet(sqlBuilder.toString());
+		if(rs.next())
+		{   
+		objPrintingUtility.funWriteTotal("30. No. OF Moved KOT", decimalFormatForInt.format(rs.getInt(1)), bufferedWriter, "");
+		bufferedWriter.newLine();
+		}
+		rs.close();
+		
 		//Start of Settlement Brkup
 		double totalAmt = 0.00;
 		bufferedWriter.write(dashLinesFor42Chars);
